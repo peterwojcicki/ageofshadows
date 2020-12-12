@@ -27,6 +27,7 @@
     <script src="js/sound.js"></script>
     <script src="js/water.js"></script>
     <script src="js/fog.js"></script>
+    <script src="js/ground.js"></script>
 
     <style>
         html, body {
@@ -70,6 +71,7 @@
     var water = null;
     var player = null;
     var fog = null;
+
     var createDefaultEngine = function () {
         return new BABYLON.Engine(canvas, true, {
             preserveDrawingBuffer: true,
@@ -81,16 +83,9 @@
 
         var scene = new BABYLON.Scene(engine);
 
-
         /********** POINTER LOCK **************************/
-
-        //We start without being locked.
         var isLocked = false;
-
-        // On click event, request pointer lock
         scene.onPointerDown = function (evt) {
-
-            //true/false check if we're locked, faster than checking pointerlock on each single click.
             if (!isLocked) {
                 canvas.requestPointerLock = canvas.requestPointerLock || canvas.msRequestPointerLock || canvas.mozRequestPointerLock || canvas.webkitRequestPointerLock;
                 if (canvas.requestPointerLock) {
@@ -99,13 +94,7 @@
             }
 
             evt.preventDefault()
-
-            //continue with shooting requests or whatever :P
-            //evt === 0 (left mouse click)
-            //evt === 1 (mouse wheel click (not scrolling))
-            //evt === 2 (right mouse click)
         };
-
 
         // Event listener when the pointerlock is updated (or removed by pressing ESC for example).
         var pointerlockchange = function () {
@@ -113,10 +102,8 @@
 
             // If the user is already locked
             if (!controlEnabled) {
-                //camera.detachControl(canvas);
                 isLocked = false;
             } else {
-                //camera.attachControl(canvas);
                 isLocked = true;
             }
         };
@@ -139,7 +126,6 @@
         camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 220, 0), scene);
         camera.attachControl(canvas, true);
         camera.angularsensibility *= -0.5;
-//        camera.speed = 0.2;
         camera.speed = 10;
 
 //        camera.ellipsoid = new BABYLON.Vector3(1, 1, 1);
@@ -147,42 +133,12 @@
         camera.ellipsoid = new BABYLON.Vector3(0.01, 1, 0.01);
 //
         camera.minZ = 0.01;
+        camera.checkCollisions = true;
+        camera.applyGravity = true;
 
-        groundConfig = {
-            mixTexture: {
-                path: "img/out.png",
-                uScale: 1
-            },
-            texture1: {
-                path: "img/grass2.jpg",
-                uScale: 20000
-            },
-            texture2: {
-                path: "img/pebbles.jpg",
-                uScale: 20000
-            },
-            texture3: {
-                path: "img/snow.jpg",
-                uScale: 20000
-            }
-        };
-        var groundTerrainMaterial = new BABYLON.TerrainMaterial("groundMaterial", scene);
-        groundTerrainMaterial.mixTexture = new BABYLON.Texture(groundConfig.mixTexture.path, scene);
-        groundTerrainMaterial.mixTexture.uScale = groundConfig.mixTexture.uScale;
-        groundTerrainMaterial.mixTexture.vScale = groundConfig.mixTexture.uScale;
-        groundTerrainMaterial.diffuseTexture1 = new BABYLON.Texture(groundConfig.texture1.path, scene);
-        groundTerrainMaterial.diffuseTexture1.uScale = groundConfig.texture1.uScale;
-        groundTerrainMaterial.diffuseTexture1.vScale = groundConfig.texture1.uScale;
-        groundTerrainMaterial.diffuseTexture2 = new BABYLON.Texture(groundConfig.texture2.path, scene);
-        groundTerrainMaterial.diffuseTexture2.uScale = groundConfig.texture2.uScale;
-        groundTerrainMaterial.diffuseTexture2.vScale = groundConfig.texture2.uScale;
-        groundTerrainMaterial.diffuseTexture3 = new BABYLON.Texture(groundConfig.texture3.path, scene);
-        groundTerrainMaterial.diffuseTexture3.uScale = groundConfig.texture3.uScale;
-        groundTerrainMaterial.diffuseTexture3.vScale = groundConfig.texture3.uScale;
 
-        var ground = BABYLON.Mesh.CreateGroundFromHeightMap("ground", "img/heightmap.jpg", 10000, 10000, 300, 0, 1000, scene, false);
-        ground.material = groundTerrainMaterial;
-
+        scene.gravity = new BABYLON.Vector3(0, -0.9, 0);
+        scene.collisionsEnabled = true;
         scene.registerBeforeRender(function () {
 
             if (keys.up == 1) {
@@ -192,6 +148,8 @@
 
         fog = new Fog();
         fog.enableLandFog(scene);
+
+        var ground = new Ground(scene);
 
         var loader = new BABYLON.AssetsManager(scene);
 
@@ -231,9 +189,6 @@
         hut.onSuccess = pos;
 
 
-        // tree
-
-
         var spruceModelConfig = {
             folder: "models/cottage/",
             file: "cottage.obj",
@@ -252,28 +207,10 @@
 
         loader.load();
 
-        const box = BABYLON.MeshBuilder.CreateBox("box", {height: 5, width: 15, depth: 15});
-        box.position = new BABYLON.Vector3(0, 0, 10);
-        box.checkCollisions = true;
+        new Skybox(scene);
+        new Sound(scene, "sounds/medieval.wav");
 
-        //finally, say which mesh will be collisionable
-        ground.checkCollisions = true;
-
-        var skybox = new Skybox(scene);
-        var bgSound = new Sound(scene, "sounds/medieval.wav");
-
-
-        //Set gravity for the scene (G force like, on Y-axis)
-        scene.gravity = new BABYLON.Vector3(0, -0.9, 0);
-        scene.collisionsEnabled = true;
-
-        //Then apply collisions and gravity to the active camera
-        camera.checkCollisions = true;
-        camera.applyGravity = true;
-
-        setTimeout(function () {
-            water = new Water(scene, ground);
-        }, 1000);
+        water = new Water(scene, ground.getGround());
 
         return scene;
     }
@@ -300,9 +237,7 @@
 
 
     window.addEventListener('keydown', function (event) {
-
         window.console.log("Position: " + camera.position + ", speed: " + camera.speed);
-
         if (event.keyCode == 32) {
             keys.up = 1;
         }
@@ -326,20 +261,15 @@
             if (water && player) {
                 if (water.isUnderwater(camera)) {
                     if (!player.isUnderwater()) {
-
                         player.goUnderwater();
-
                         new Sound(scene, "sounds/splash.wav");
                         camera.applyGravity = false;
 
                         fog.enableUnderwaterFog(scene);
                     }
                 } else {
-
                     if (player.isUnderwater()) {
-
                         player.emergeFromUnderwater();
-
                         camera.applyGravity = true;
 
                         fog.enableLandFog(scene);
