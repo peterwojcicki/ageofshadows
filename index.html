@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+    <title>Babylon.js sample code</title>
+
+    <!-- Babylon.js -->
+    <script src="https://code.jquery.com/pep/0.4.2/pep.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.6.2/dat.gui.min.js"></script>
+    <script src="https://preview.babylonjs.com/ammo.js"></script>
+    <script src="https://preview.babylonjs.com/cannon.js"></script>
+    <script src="https://preview.babylonjs.com/Oimo.js"></script>
+    <script src="https://preview.babylonjs.com/earcut.min.js"></script>
+    <script src="https://preview.babylonjs.com/babylon.js"></script>
+    <script src="https://preview.babylonjs.com/materialsLibrary/babylonjs.materials.min.js"></script>
+    <script src="https://preview.babylonjs.com/proceduralTexturesLibrary/babylonjs.proceduralTextures.min.js"></script>
+    <script src="https://preview.babylonjs.com/postProcessesLibrary/babylonjs.postProcess.min.js"></script>
+    <script src="https://preview.babylonjs.com/loaders/babylonjs.loaders.js"></script>
+    <script src="https://preview.babylonjs.com/serializers/babylonjs.serializers.min.js"></script>
+    <script src="https://preview.babylonjs.com/gui/babylon.gui.min.js"></script>
+    <script src="https://preview.babylonjs.com/inspector/babylon.inspector.bundle.js"></script>
+    <script src="js/lib/babylon.objFileLoader.js"></script>
+
+    <script src="js/player.js"></script>
+    <script src="js/skybox.js"></script>
+    <script src="js/sound.js"></script>
+    <script src="js/water.js"></script>
+    <script src="js/fog.js"></script>
+
+    <style>
+        html, body {
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #renderCanvas {
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+        }
+    </style>
+</head>
+<body>
+<canvas id="renderCanvas"></canvas>
+<script>
+    var canvas = document.getElementById("renderCanvas");
+
+    var keys = {
+        rotateLeft: 0,
+        rotateRight: 0,
+        left: 0,
+        right: 0,
+        forward: 0,
+        backward: 0,
+        zoomIn: 0,
+        zoomOut: 0,
+        up: 0,
+        kick: 0,
+        fireGun: 0
+    };
+
+    var engine = null;
+    var scene = null;
+    var camera = null;
+    var sceneToRender = null;
+    var water = null;
+    var player = null;
+    var fog = null;
+    var createDefaultEngine = function () {
+        return new BABYLON.Engine(canvas, true, {
+            preserveDrawingBuffer: true,
+            stencil: true,
+            disableWebGL2Support: false
+        });
+    };
+    var createScene = function () {
+
+        var scene = new BABYLON.Scene(engine);
+
+
+        /********** POINTER LOCK **************************/
+
+        //We start without being locked.
+        var isLocked = false;
+
+        // On click event, request pointer lock
+        scene.onPointerDown = function (evt) {
+
+            //true/false check if we're locked, faster than checking pointerlock on each single click.
+            if (!isLocked) {
+                canvas.requestPointerLock = canvas.requestPointerLock || canvas.msRequestPointerLock || canvas.mozRequestPointerLock || canvas.webkitRequestPointerLock;
+                if (canvas.requestPointerLock) {
+                    canvas.requestPointerLock();
+                }
+            }
+
+            evt.preventDefault()
+
+            //continue with shooting requests or whatever :P
+            //evt === 0 (left mouse click)
+            //evt === 1 (mouse wheel click (not scrolling))
+            //evt === 2 (right mouse click)
+        };
+
+
+        // Event listener when the pointerlock is updated (or removed by pressing ESC for example).
+        var pointerlockchange = function () {
+            var controlEnabled = document.mozPointerLockElement || document.webkitPointerLockElement || document.msPointerLockElement || document.pointerLockElement || null;
+
+            // If the user is already locked
+            if (!controlEnabled) {
+                //camera.detachControl(canvas);
+                isLocked = false;
+            } else {
+                //camera.attachControl(canvas);
+                isLocked = true;
+            }
+        };
+
+        /**************************************************************/
+
+        // Attach events to the document
+        document.addEventListener("pointerlockchange", pointerlockchange, false);
+        document.addEventListener("mspointerlockchange", pointerlockchange, false);
+        document.addEventListener("mozpointerlockchange", pointerlockchange, false);
+        document.addEventListener("webkitpointerlockchange", pointerlockchange, false);
+
+
+        //Adding a light
+        var light0 = new BABYLON.DirectionalLight("Omni", new BABYLON.Vector3(-2, -5, 2), scene);
+        var light1 = new BABYLON.PointLight("Omni2", new BABYLON.Vector3(2, -5, -2), scene);
+
+        player = new Player(scene);
+
+        camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 220, 0), scene);
+        camera.attachControl(canvas, true);
+        camera.angularsensibility *= -0.5;
+//        camera.speed = 0.2;
+        camera.speed = 10;
+
+//        camera.ellipsoid = new BABYLON.Vector3(1, 1, 1);
+        // TODO this is a hack - making the camera's elipsoid very thin prevents sliding down slopes
+        camera.ellipsoid = new BABYLON.Vector3(0.01, 1, 0.01);
+//
+        camera.minZ = 0.01;
+
+        groundConfig = {
+            mixTexture: {
+                path: "img/out.png",
+                uScale: 1
+            },
+            texture1: {
+                path: "img/grass2.jpg",
+                uScale: 20000
+            },
+            texture2: {
+                path: "img/pebbles.jpg",
+                uScale: 20000
+            },
+            texture3: {
+                path: "img/snow.jpg",
+                uScale: 20000
+            }
+        };
+        var groundTerrainMaterial = new BABYLON.TerrainMaterial("groundMaterial", scene);
+        groundTerrainMaterial.mixTexture = new BABYLON.Texture(groundConfig.mixTexture.path, scene);
+        groundTerrainMaterial.mixTexture.uScale = groundConfig.mixTexture.uScale;
+        groundTerrainMaterial.mixTexture.vScale = groundConfig.mixTexture.uScale;
+        groundTerrainMaterial.diffuseTexture1 = new BABYLON.Texture(groundConfig.texture1.path, scene);
+        groundTerrainMaterial.diffuseTexture1.uScale = groundConfig.texture1.uScale;
+        groundTerrainMaterial.diffuseTexture1.vScale = groundConfig.texture1.uScale;
+        groundTerrainMaterial.diffuseTexture2 = new BABYLON.Texture(groundConfig.texture2.path, scene);
+        groundTerrainMaterial.diffuseTexture2.uScale = groundConfig.texture2.uScale;
+        groundTerrainMaterial.diffuseTexture2.vScale = groundConfig.texture2.uScale;
+        groundTerrainMaterial.diffuseTexture3 = new BABYLON.Texture(groundConfig.texture3.path, scene);
+        groundTerrainMaterial.diffuseTexture3.uScale = groundConfig.texture3.uScale;
+        groundTerrainMaterial.diffuseTexture3.vScale = groundConfig.texture3.uScale;
+
+        var ground = BABYLON.Mesh.CreateGroundFromHeightMap("ground", "img/heightmap.jpg", 10000, 10000, 300, 0, 1000, scene, false);
+        ground.material = groundTerrainMaterial;
+
+        scene.registerBeforeRender(function () {
+
+            if (keys.up == 1) {
+                player.moveUp(camera);
+            }
+        });
+
+        fog = new Fog();
+        fog.enableLandFog(scene);
+
+        var loader = new BABYLON.AssetsManager(scene);
+
+        var modelConfig = {
+            folder: "models/house/",
+            file: "house_obj.obj",
+            scaling: 0.02,
+            offsetY: -20,
+            rotation: new BABYLON.Vector3(0, 0, 0)
+        };
+
+        var pos = function (t) {
+            t.loadedMeshes.forEach(function (m) {
+
+                var light = new BABYLON.HemisphericLight("Hemi0", t.customPosition.add(new BABYLON.Vector3(20, 20, 0)), scene);
+                light.includedOnlyMeshes.push(m);
+                light.intensity = 1.0;
+
+                m.rotation = t.customRotation;
+
+                m.scaling.x = t.scaling;
+                m.scaling.y = t.scaling;
+                m.scaling.z = t.scaling;
+
+                m.position = t.customPosition;
+
+                m.checkCollisions = true;
+
+            });
+        };
+
+        var hut = loader.addMeshTask("myModel", "", modelConfig.folder, modelConfig.file);
+        hut.scaling = modelConfig.scaling;
+        hut.modelPositionY = modelConfig.offsetY;
+        hut.customPosition = new BABYLON.Vector3(-7, 67, 50);
+        hut.customRotation = modelConfig.rotation;
+        hut.onSuccess = pos;
+
+
+        // tree
+
+
+        var spruceModelConfig = {
+            folder: "models/cottage/",
+            file: "cottage.obj",
+            scaling: 1.0,
+            offsetY: 0,
+            rotation: new BABYLON.Vector3(-Math.PI / 2, 0, 0)
+        };
+
+        var spruce = loader.addMeshTask("myModel", "", spruceModelConfig.folder, spruceModelConfig.file);
+        spruce.scaling = spruceModelConfig.scaling;
+        spruce.modelPositionY = spruceModelConfig.offsetY;
+        spruce.customPosition = new BABYLON.Vector3(10, 0, -5);
+        spruce.customRotation = spruceModelConfig.rotation;
+        spruce.onSuccess = pos;
+
+
+        loader.load();
+
+        const box = BABYLON.MeshBuilder.CreateBox("box", {height: 5, width: 15, depth: 15});
+        box.position = new BABYLON.Vector3(0, 0, 10);
+        box.checkCollisions = true;
+
+        //finally, say which mesh will be collisionable
+        ground.checkCollisions = true;
+
+        var skybox = new Skybox(scene);
+        var bgSound = new Sound(scene, "sounds/medieval2.wav");
+
+
+        //Set gravity for the scene (G force like, on Y-axis)
+        scene.gravity = new BABYLON.Vector3(0, -0.9, 0);
+        scene.collisionsEnabled = true;
+
+        //Then apply collisions and gravity to the active camera
+        camera.checkCollisions = true;
+        camera.applyGravity = true;
+
+        setTimeout(function () {
+            water = new Water(scene, ground);
+        }, 1000);
+
+        return scene;
+    }
+    var engine;
+    var scene;
+    var postProcess2;
+    var postProcess3;
+
+    initFunction = function () {
+        var asyncEngineCreation = function () {
+            try {
+                return createDefaultEngine();
+            } catch (e) {
+                console.log("the available createEngine function failed. Creating the default engine instead");
+                return createDefaultEngine();
+            }
+        }
+
+        engine = asyncEngineCreation();
+        if (!engine) throw 'engine should not be null.';
+        scene = createScene();
+    };
+    initFunction();
+
+
+    window.addEventListener('keydown', function (event) {
+
+        window.console.log("Position: " + camera.position + ", speed: " + camera.speed);
+
+        if (event.keyCode == 32) {
+            keys.up = 1;
+        }
+    });
+    window.addEventListener('keyup', function (event) {
+        if (event.keyCode == 32) {
+            keys.up = 0;
+
+            // this is a hack for the camera not falling
+            camera._needMoveForGravity = true;
+        }
+    });
+
+
+    sceneToRender = scene;
+
+    engine.runRenderLoop(function () {
+        if (sceneToRender && sceneToRender.activeCamera) {
+            sceneToRender.render();
+
+            if (water && player) {
+                if (water.isUnderwater(camera)) {
+                    if (!player.isUnderwater()) {
+
+                        player.goUnderwater();
+
+                        new Sound(scene, "sounds/splash.wav");
+                        camera.applyGravity = false;
+
+                        fog.enableUnderwaterFog(scene);
+                    }
+                } else {
+
+                    if (player.isUnderwater()) {
+
+                        player.emergeFromUnderwater();
+
+                        camera.applyGravity = true;
+
+                        fog.enableLandFog(scene);
+                    }
+                }
+            }
+        }
+    });
+
+    // Resize
+    window.addEventListener("resize", function () {
+        engine.resize();
+    });
+</script>
+</body>
+</html>
