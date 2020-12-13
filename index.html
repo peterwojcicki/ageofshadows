@@ -28,6 +28,8 @@
     <script src="js/water.js"></script>
     <script src="js/fog.js"></script>
     <script src="js/ground.js"></script>
+    <script src="js/modelmanager.js"></script>
+    <script src="js/modelconfigs.js"></script>
 
     <style>
         html, body {
@@ -68,6 +70,7 @@
     var scene = null;
     var camera = null;
     var sceneToRender = null;
+    var ground = null;
     var water = null;
     var player = null;
     var fog = null;
@@ -118,8 +121,8 @@
 
 
         //Adding a light
-        var light0 = new BABYLON.DirectionalLight("Omni", new BABYLON.Vector3(-2, -5, 2), scene);
-        var light1 = new BABYLON.PointLight("Omni2", new BABYLON.Vector3(2, -5, -2), scene);
+        new BABYLON.DirectionalLight("Omni", new BABYLON.Vector3(-2, -5, 2), scene);
+        new BABYLON.PointLight("Omni2", new BABYLON.Vector3(2, -5, -2), scene);
 
         player = new Player(scene);
 
@@ -127,11 +130,9 @@
         camera.attachControl(canvas, true);
         camera.angularsensibility *= -0.5;
         camera.speed = 10;
-
 //        camera.ellipsoid = new BABYLON.Vector3(1, 1, 1);
         // TODO this is a hack - making the camera's elipsoid very thin prevents sliding down slopes
         camera.ellipsoid = new BABYLON.Vector3(0.01, 1, 0.01);
-//
         camera.minZ = 0.01;
         camera.checkCollisions = true;
         camera.applyGravity = true;
@@ -140,7 +141,6 @@
         scene.gravity = new BABYLON.Vector3(0, -0.9, 0);
         scene.collisionsEnabled = true;
         scene.registerBeforeRender(function () {
-
             if (keys.up == 1) {
                 player.moveUp(camera);
             }
@@ -149,68 +149,39 @@
         fog = new Fog();
         fog.enableLandFog(scene);
 
-        var ground = new Ground(scene);
+        var onGroundReady = function (groundMesh) {
 
-        var loader = new BABYLON.AssetsManager(scene);
+            setTimeout(function () {
+                groundMesh.updateCoordinateHeights();
 
-        var modelConfig = {
-            folder: "models/house/",
-            file: "house_obj.obj",
-            scaling: 0.02,
-            offsetY: -20,
-            rotation: new BABYLON.Vector3(0, 0, 0)
-        };
+                var modelConfig = new ModelConfig();
+                var modelConfigs = [];
 
-        var pos = function (t) {
-            t.loadedMeshes.forEach(function (m) {
+                for (var x = -1000; x < 1000; x += 1000) {
+                    for (var z = -1000; z < 1000; z += 1000) {
 
-                var light = new BABYLON.HemisphericLight("Hemi0", t.customPosition.add(new BABYLON.Vector3(20, 20, 0)), scene);
-                light.includedOnlyMeshes.push(m);
-                light.intensity = 1.0;
+                        var y = groundMesh.getHeightAtCoordinates(x, z);
+                        if (y < 400 && y > 100) {
+                            modelConfigs.push({
+                                position: new BABYLON.Vector3(x, y, z),
+                                config: modelConfig.getBambooDefinition(),
+                                rotationY: 0
+                            });
+                        }
+                    }
+                }
 
-                m.rotation = t.customRotation;
+                var modelManager = new ModelManager(modelConfigs, scene);
 
-                m.scaling.x = t.scaling;
-                m.scaling.y = t.scaling;
-                m.scaling.z = t.scaling;
+            }, 2000);
+        }
 
-                m.position = t.customPosition;
-
-                m.checkCollisions = true;
-
-            });
-        };
-
-        var hut = loader.addMeshTask("myModel", "", modelConfig.folder, modelConfig.file);
-        hut.scaling = modelConfig.scaling;
-        hut.modelPositionY = modelConfig.offsetY;
-        hut.customPosition = new BABYLON.Vector3(-7, 67, 50);
-        hut.customRotation = modelConfig.rotation;
-        hut.onSuccess = pos;
-
-
-        var spruceModelConfig = {
-            folder: "models/cottage/",
-            file: "cottage.obj",
-            scaling: 1.0,
-            offsetY: 0,
-            rotation: new BABYLON.Vector3(-Math.PI / 2, 0, 0)
-        };
-
-        var spruce = loader.addMeshTask("myModel", "", spruceModelConfig.folder, spruceModelConfig.file);
-        spruce.scaling = spruceModelConfig.scaling;
-        spruce.modelPositionY = spruceModelConfig.offsetY;
-        spruce.customPosition = new BABYLON.Vector3(10, 0, -5);
-        spruce.customRotation = spruceModelConfig.rotation;
-        spruce.onSuccess = pos;
-
-
-        loader.load();
+        ground = new Ground(scene, onGroundReady);
+        water = new Water(scene, ground.getGround());
 
         new Skybox(scene);
         new Sound(scene, "sounds/medieval.wav");
 
-        water = new Water(scene, ground.getGround());
 
         return scene;
     }
@@ -237,7 +208,7 @@
 
 
     window.addEventListener('keydown', function (event) {
-        window.console.log("Position: " + camera.position + ", speed: " + camera.speed);
+        window.console.log("Position: " + camera.position + ", ground height: " + ground.getHeightAtCoordinates(camera.position.x, camera.position.z));
         if (event.keyCode == 32) {
             keys.up = 1;
         }

@@ -20,6 +20,6 @@ Water.prototype.getPosition = function (camera) {
 }
 
 Water.prototype.isUnderwater = function (camera) {
-    return camera.position.y < this.waterMesh.position.y + 1;
+    return camera.position.y < this.waterMesh.position.y + 2;
 }
 
