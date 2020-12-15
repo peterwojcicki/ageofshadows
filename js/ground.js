@@ -40,6 +40,10 @@ Ground.prototype.getGround = function () {
     return this.ground;
 }
 
+Ground.prototype.updateCoordinateHeights = function () {
+    return this.ground.updateCoordinateHeights();
+}
+
 Ground.prototype.getHeightAtCoordinates = function (x, z) {
     return this.ground.getHeightAtCoordinates(x, z);
 }

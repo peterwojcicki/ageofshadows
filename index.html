@@ -30,6 +30,8 @@
     <script src="js/ground.js"></script>
     <script src="js/modelmanager.js"></script>
     <script src="js/modelconfigs.js"></script>
+    <script src="js/kelp.js"></script>
+    <script src="js/kelpmanager.js"></script>
 
     <style>
         html, body {
@@ -157,27 +159,28 @@
                 var modelConfig = new ModelConfig();
                 var modelConfigs = [];
 
-                var bambooModelConfigs = {
-                    config: modelConfig.getBambooDefinition(),
-                    instances: []
-                };
-                // TODO
-                for (var x = -4000; x < 4000; x += 10000) {
-                    for (var z = -4000; z < 4000; z += 10000) {
-
-                        var y = groundMesh.getHeightAtCoordinates(x, z);
-                        if (y < 400 && y > 100) {
-                            bambooModelConfigs.instances.push({
-                                position: new BABYLON.Vector3(x, y, z),
-                                rotationY: 0
-                            });
-                        }
-                    }
-                }
-                modelConfigs.push(bambooModelConfigs);
+//                var bambooModelConfigs = {
+//                    config: modelConfig.getBambooDefinition(),
+//                    instances: []
+//                };
+//                // TODO
+//                for (var x = -4000; x < 4000; x += 10000) {
+//                    for (var z = -4000; z < 4000; z += 10000) {
+//
+//                        var y = groundMesh.getHeightAtCoordinates(x, z);
+//                        if (y < 400 && y > 100) {
+//                            bambooModelConfigs.instances.push({
+//                                position: new BABYLON.Vector3(x, y, z),
+//                                rotationY: 0
+//                            });
+//                        }
+//                    }
+//                }
+//                modelConfigs.push(bambooModelConfigs);
 
                 var modelManager = new ModelManager(modelConfigs, scene);
 
+                new KelpManager(scene, water, ground);
             }, 2000);
         }
 
@@ -186,7 +189,6 @@
 
         new Skybox(scene);
         new Sound(scene, "sounds/medieval.wav");
-
 
         return scene;
     }
