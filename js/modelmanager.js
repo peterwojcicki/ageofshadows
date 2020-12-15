@@ -6,6 +6,7 @@ function ModelManager(modelConfigs, scene) {
 
         var modelConfig = modelConfigs[i];
 
+        var firstMesh;
         var pos = function (t) {
             t.loadedMeshes.forEach(function (m) {
 
@@ -26,15 +27,26 @@ function ModelManager(modelConfigs, scene) {
                 // TODO make is a config variable
                 m.checkCollisions = false;
 
+                firstMesh = m;
             });
         };
 
-        var hut = loader.addMeshTask("myModel", "", modelConfig.config.folder, modelConfig.config.file);
-        hut.scaling = modelConfig.config.scaling;
-        hut.modelPositionY = modelConfig.config.offsetY;
-        hut.customPosition = modelConfig.position;
-        hut.customRotation = modelConfig.rotationY;
-        hut.onSuccess = pos;
+        var firstInstanceConfig = modelConfig.instances[0];
+
+        var firstInstance = loader.addMeshTask("myModel", "", modelConfig.config.folder, modelConfig.config.file);
+        firstInstance.scaling = modelConfig.config.scaling;
+        firstInstance.modelPositionY = modelConfig.config.offsetY;
+        firstInstance.customPosition = firstInstanceConfig.position;
+        firstInstance.customRotation = firstInstanceConfig.rotationY;
+        firstInstance.onSuccess = pos;
+
+        setTimeout(function () {
+            for (var i = 1; i < modelConfig.instances.length; i++) {
+                var followingInstanceConfig = modelConfig.instances[i];
+                var followingInstance = firstMesh.clone();
+                followingInstance.position = followingInstanceConfig.position;
+            }
+        }, 2000);
     }
 
     loader.load();

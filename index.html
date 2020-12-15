@@ -157,19 +157,24 @@
                 var modelConfig = new ModelConfig();
                 var modelConfigs = [];
 
-                for (var x = -1000; x < 1000; x += 1000) {
-                    for (var z = -1000; z < 1000; z += 1000) {
+                var bambooModelConfigs = {
+                    config: modelConfig.getBambooDefinition(),
+                    instances: []
+                };
+                // TODO
+                for (var x = -4000; x < 4000; x += 10000) {
+                    for (var z = -4000; z < 4000; z += 10000) {
 
                         var y = groundMesh.getHeightAtCoordinates(x, z);
                         if (y < 400 && y > 100) {
-                            modelConfigs.push({
+                            bambooModelConfigs.instances.push({
                                 position: new BABYLON.Vector3(x, y, z),
-                                config: modelConfig.getBambooDefinition(),
                                 rotationY: 0
                             });
                         }
                     }
                 }
+                modelConfigs.push(bambooModelConfigs);
 
                 var modelManager = new ModelManager(modelConfigs, scene);
 
