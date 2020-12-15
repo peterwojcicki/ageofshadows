@@ -31,7 +31,10 @@
     <script src="js/modelmanager.js"></script>
     <script src="js/modelconfigs.js"></script>
     <script src="js/kelp.js"></script>
+    <script src="js/boulder.js"></script>
     <script src="js/kelpmanager.js"></script>
+    <script src="js/bouldermanager.js"></script>
+    <script src="js/groundscanner.js"></script>
 
     <style>
         html, body {
@@ -144,8 +147,8 @@
 
         camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(162, 100, -265), scene);
         camera.attachControl(canvas, true);
-        camera.angularsensibility *= -0.5;
-        camera.speed = 10;
+        camera.angularsensibility *= -0.3;
+        camera.speed = 1;
 //        camera.ellipsoid = new BABYLON.Vector3(1, 1, 1);
         // TODO this is a hack - making the camera's elipsoid very thin prevents sliding down slopes
         camera.ellipsoid = new BABYLON.Vector3(0.01, 1, 0.01);
@@ -194,7 +197,10 @@
 
                 var modelManager = new ModelManager(modelConfigs, scene);
 
-                new KelpManager(scene, water, ground);
+                let kelpManager = new KelpManager(scene);
+                let boulderManager = new BoulderManager(scene);
+
+                new GroundScanner(scene, ground, water, kelpManager, boulderManager);
             });
         }
 
@@ -246,6 +252,7 @@
 
     sceneToRender = scene;
 
+    let frameIndex = 0;
     engine.runRenderLoop(function () {
 
         let divFps = document.getElementById("fps");
@@ -254,21 +261,20 @@
             divFps.innerHTML = engine.getFps().toFixed() + " fps";
             sceneToRender.render();
 
-            if (water && player) {
+            frameIndex++;
+            if (water && player && (frameIndex % 10 == 0)) {
                 if (water.isUnderwater(camera)) {
                     if (!player.isUnderwater()) {
+                        fog.enableUnderwaterFog(scene);
                         player.goUnderwater();
                         new Sound(scene, "sounds/splash.wav");
                         camera.applyGravity = false;
-
-                        fog.enableUnderwaterFog(scene);
                     }
                 } else {
                     if (player.isUnderwater()) {
+                        fog.enableLandFog(scene);
                         player.emergeFromUnderwater();
                         camera.applyGravity = true;
-
-                        fog.enableLandFog(scene);
                     }
                 }
             }

@@ -14,7 +14,7 @@ function Kelp(scene, position, height) {
 
     this.tube = BABYLON.MeshBuilder.CreateTube("tube", {
         path: curve,
-        radius: 0.2,
+        radius: 0.1,
         sideOrientation: BABYLON.Mesh.DOUBLESIDE
     }, scene);
 
