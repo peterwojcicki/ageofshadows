@@ -47,9 +47,23 @@
             height: 100%;
             touch-action: none;
         }
+
+        #fps {
+            position: absolute;
+            background-color: black;
+            border: 2px solid red;
+            text-align: center;
+            font-size: 16px;
+            color: white;
+            top: 15px;
+            right: 10px;
+            width: 60px;
+            height: 20px;
+        }
     </style>
 </head>
 <body>
+<div id="fps">0</div>
 <canvas id="renderCanvas"></canvas>
 <script>
     var canvas = document.getElementById("renderCanvas");
@@ -181,7 +195,7 @@
                 var modelManager = new ModelManager(modelConfigs, scene);
 
                 new KelpManager(scene, water, ground);
-            }, 2000);
+            });
         }
 
         ground = new Ground(scene, onGroundReady);
@@ -233,7 +247,11 @@
     sceneToRender = scene;
 
     engine.runRenderLoop(function () {
+
+        let divFps = document.getElementById("fps");
+
         if (sceneToRender && sceneToRender.activeCamera) {
+            divFps.innerHTML = engine.getFps().toFixed() + " fps";
             sceneToRender.render();
 
             if (water && player) {
