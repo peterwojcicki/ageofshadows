@@ -20,10 +20,12 @@ Fog.prototype.enableLandFog = function (scene) {
     scene.activeCamera.detachPostProcess(this.postProcess2);
     scene.activeCamera.detachPostProcess(this.postProcess3);
 
-    scene.fogEnabled = false;
-    //scene.fogMode = BABYLON.Scene.FOGMODE_EXP;
-    //scene.fogColor = new BABYLON.Color3(0.9, 0.9, 0.85);
-    //scene.fogDensity = 0.01;
+    scene.fogEnabled = true;
+    scene.fogMode = BABYLON.Scene.FOGMODE_LINEAR;
+    scene.fogColor = new BABYLON.Color3(0.9, 0.9, 0.85);
+    scene.fogDensity = 0.01;
+    scene.fogStart = 1.0;
+    scene.fogEnd = 500.0;
 
 }
 

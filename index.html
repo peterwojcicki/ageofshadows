@@ -21,6 +21,7 @@
     <script src="https://preview.babylonjs.com/gui/babylon.gui.min.js"></script>
     <script src="https://preview.babylonjs.com/inspector/babylon.inspector.bundle.js"></script>
     <script src="js/lib/babylon.objFileLoader.js"></script>
+    <script src="js/lib/treegenerator.js"></script>
 
     <script src="js/player.js"></script>
     <script src="js/skybox.js"></script>
@@ -35,6 +36,8 @@
     <script src="js/kelpmanager.js"></script>
     <script src="js/bouldermanager.js"></script>
     <script src="js/groundscanner.js"></script>
+    <script src="js/tree.js"></script>
+    <script src="js/treemanager.js"></script>
 
     <style>
         html, body {
@@ -199,8 +202,9 @@
 
                 let kelpManager = new KelpManager(scene);
                 let boulderManager = new BoulderManager(scene);
+                let treeManager = new TreeManager();
 
-                new GroundScanner(scene, ground, water, kelpManager, boulderManager);
+                new GroundScanner(scene, ground, water, kelpManager, boulderManager, treeManager);
             });
         }
 
@@ -261,23 +265,23 @@
             divFps.innerHTML = engine.getFps().toFixed() + " fps";
             sceneToRender.render();
 
-            frameIndex++;
-            if (water && player && (frameIndex % 10 == 0)) {
-                if (water.isUnderwater(camera)) {
-                    if (!player.isUnderwater()) {
-                        fog.enableUnderwaterFog(scene);
-                        player.goUnderwater();
-                        new Sound(scene, "sounds/splash.wav");
-                        camera.applyGravity = false;
-                    }
-                } else {
-                    if (player.isUnderwater()) {
-                        fog.enableLandFog(scene);
-                        player.emergeFromUnderwater();
-                        camera.applyGravity = true;
-                    }
-                }
-            }
+//            frameIndex++;
+//            if (water && player && (frameIndex % 10 == 0)) {
+//                if (water.isUnderwater(camera)) {
+//                    if (!player.isUnderwater()) {
+//                        fog.enableUnderwaterFog(scene);
+//                        player.goUnderwater();
+//                        new Sound(scene, "sounds/splash.wav");
+//                        camera.applyGravity = false;
+//                    }
+//                } else {
+//                    if (player.isUnderwater()) {
+//                        fog.enableLandFog(scene);
+//                        player.emergeFromUnderwater();
+//                        camera.applyGravity = true;
+//                    }
+//                }
+//            }
         }
     });
 
