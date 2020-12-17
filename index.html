@@ -268,7 +268,10 @@
             sceneToRender.render();
 
             frameIndex++;
-            if (water && player && (frameIndex % 100 == 0)) {
+
+            let distanceFromWater = Math.abs(camera.position.y - water.getPosition().y);
+
+            if (water && player && (distanceFromWater < 50) && (frameIndex % 10 == 0)) {
                 if (water.isUnderwater(camera)) {
                     if (!player.isUnderwater()) {
                         fog.enableUnderwaterFog(scene);
