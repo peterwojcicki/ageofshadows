@@ -96,6 +96,7 @@
     var water = null;
     var player = null;
     var fog = null;
+    var treeManager;
 
     var createDefaultEngine = function () {
         return new BABYLON.Engine(canvas, true, {
@@ -148,10 +149,10 @@
 
         player = new Player(scene);
 
-        camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(162, 100, -265), scene);
+        camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 300, 50), scene);
         camera.attachControl(canvas, true);
         camera.angularsensibility *= -0.3;
-        camera.speed = 1;
+        camera.speed = 10;
 //        camera.ellipsoid = new BABYLON.Vector3(1, 1, 1);
         // TODO this is a hack - making the camera's elipsoid very thin prevents sliding down slopes
         camera.ellipsoid = new BABYLON.Vector3(0.01, 1, 0.01);
@@ -202,7 +203,7 @@
 
                 let kelpManager = new KelpManager(scene);
                 let boulderManager = new BoulderManager(scene);
-                let treeManager = new TreeManager();
+                treeManager = new TreeManager();
 
                 new GroundScanner(scene, ground, water, kelpManager, boulderManager, treeManager);
             });
@@ -212,7 +213,7 @@
         water = new Water(scene, ground.getGround());
 
         new Skybox(scene);
-        new Sound(scene, "sounds/medieval.wav");
+//        new Sound(scene, "sounds/medieval.wav");
 
         return scene;
     }
@@ -265,7 +266,7 @@
             divFps.innerHTML = engine.getFps().toFixed() + " fps";
             sceneToRender.render();
 
-//            frameIndex++;
+            frameIndex++;
 //            if (water && player && (frameIndex % 10 == 0)) {
 //                if (water.isUnderwater(camera)) {
 //                    if (!player.isUnderwater()) {
@@ -282,6 +283,10 @@
 //                    }
 //                }
 //            }
+
+            if (treeManager && frameIndex % 1000) {
+                treeManager.update(camera);
+            }
         }
     });
 

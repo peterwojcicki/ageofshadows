@@ -31,7 +31,7 @@ function Ground(scene, onReady) {
     groundTerrainMaterial.diffuseTexture3.uScale = groundConfig.texture3.uScale;
     groundTerrainMaterial.diffuseTexture3.vScale = groundConfig.texture3.uScale;
 
-    this.ground = BABYLON.Mesh.CreateGroundFromHeightMap("ground", "img/heightmap.jpg", 10000, 10000, 200, 0, 1000, scene, false, onReady);
+    this.ground = BABYLON.Mesh.CreateGroundFromHeightMap("ground", "img/heightmap.jpg", 10000, 10000, 300, 0, 1000, scene, false, onReady);
     this.ground.material = groundTerrainMaterial;
     this.ground.checkCollisions = true;
 }

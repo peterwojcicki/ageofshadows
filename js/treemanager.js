@@ -7,35 +7,76 @@ function TreeManager() {
     this.barkMaterial.diffuseTexture.vScale = 2.0;//Repeat 5 times on the Horizontal Axes
     this.barkMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
 
-    this.radius = 60;
+
     this.woods = [];
+    this.woods.push({
+        position: new BABYLON.Vector3(0, 0, 0),
+        radius: 300
+    });
+    this.woods.push({
+        position: new BABYLON.Vector3(800, 0, 800),
+        radius: 100
+    });
 
-    for (let x = -4000; x < 4000; x += 1000) {
-        for (let z = -4000; z < 4000; z += 1000) {
-            this.woods.push(new BABYLON.Vector3(x, 0, z));
-        }
+    this.visibleWoodIndex = -1;
+
+    this.positions = [];
+    this.trees = [];
+    for (let i = 0; i < 100; i++) {
+        this.trees.push(new Tree(scene, new BABYLON.Vector3(0, -100, 0), this.barkMaterial));
     }
-
-    this.firstTree = undefined;
 }
 
 TreeManager.prototype.accept = function (scene, groundPosition, depth) {
-    if (depth < -100 && depth > -200) {
+    if (depth < -100) {
+        this.positions.push(groundPosition.add(new BABYLON.Vector3(0, -1, 0)));
+    }
+}
 
-        for (let i = 0; i < this.woods.length; i++) {
-            let woodPosition = this.woods[i];
+TreeManager.prototype.showWood = function (wood) {
+    let woodPosition = wood.position;
+    let treeIndex = 0;
+    for (let i = 0; i < this.positions.length; i++) {
+        let currentPosition = this.positions[i];
+        if (Math.abs(currentPosition.x - woodPosition.x) < wood.radius
+            && Math.abs(currentPosition.z - woodPosition.z) < wood.radius) {
+            this.trees[treeIndex].moveTo(currentPosition.clone());
 
-            if ((Math.abs(woodPosition.x - groundPosition.x) < this.radius)
-                && (Math.abs(woodPosition.z - groundPosition.z) < this.radius)) {
-                if (!this.firstTree) {
-                    let tree = new Tree(scene, groundPosition.add(new BABYLON.Vector3(0, -1, 0)), this.barkMaterial);
-                    this.firstTree = tree;
-                } else {
-                    let clonedTree = this.firstTree.getMesh().clone();
-                    clonedTree.position = groundPosition.add(new BABYLON.Vector3(0, -1, 0));
-                }
+            window.console.log("Placing tree at " + currentPosition);
+
+            treeIndex++;
+
+            // we've run out of trees
+            if (treeIndex == this.trees.length) {
+                break;
             }
         }
     }
 }
 
+TreeManager.prototype.hideAllTrees = function () {
+    for (let i = 0; i < this.trees.length; i++) {
+        this.trees[i].hide();
+    }
+}
+
+TreeManager.prototype.update = function (camera) {
+    for (let i = 0; i < this.woods.length; i++) {
+        let wood = this.woods[i];
+        let woodPosition = wood.position;
+
+        if (Math.abs(camera.position.x - woodPosition.x) < 500
+            && Math.abs(camera.position.z - woodPosition.z) < 500) {
+            if (i != this.visibleWoodIndex) {
+
+                window.console.log("TreeManager.update - show wood at index " + i);
+
+                this.hideAllTrees();
+                this.visibleWoodIndex = i;
+                this.showWood(wood);
+
+                break;
+            }
+        }
+    }
+}

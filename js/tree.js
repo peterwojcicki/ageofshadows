@@ -5,7 +5,7 @@ function Tree(scene, position, barkMaterial) {
 
 
     //Tree parameters
-    var trunk_height = 12;
+    var trunk_height = 30;
     var trunk_taper = 0.6;
     var trunk_slices = 2;
     var boughs = 2; // 1 or 2
@@ -25,4 +25,12 @@ function Tree(scene, position, barkMaterial) {
 
 Tree.prototype.getMesh = function (camera) {
     return this.tree;
+}
+
+Tree.prototype.hide = function () {
+    this.tree.position = new BABYLON.Vector3(0, -100, 0);
+}
+
+Tree.prototype.moveTo = function (position) {
+    this.tree.position = position;
 }
