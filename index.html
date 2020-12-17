@@ -267,22 +267,22 @@
             sceneToRender.render();
 
             frameIndex++;
-//            if (water && player && (frameIndex % 10 == 0)) {
-//                if (water.isUnderwater(camera)) {
-//                    if (!player.isUnderwater()) {
-//                        fog.enableUnderwaterFog(scene);
-//                        player.goUnderwater();
-//                        new Sound(scene, "sounds/splash.wav");
-//                        camera.applyGravity = false;
-//                    }
-//                } else {
-//                    if (player.isUnderwater()) {
-//                        fog.enableLandFog(scene);
-//                        player.emergeFromUnderwater();
-//                        camera.applyGravity = true;
-//                    }
-//                }
-//            }
+            if (water && player && (frameIndex % 100 == 0)) {
+                if (water.isUnderwater(camera)) {
+                    if (!player.isUnderwater()) {
+                        fog.enableUnderwaterFog(scene);
+                        player.goUnderwater();
+                        new Sound(scene, "sounds/splash.wav");
+                        camera.applyGravity = false;
+                    }
+                } else {
+                    if (player.isUnderwater()) {
+                        fog.enableLandFog(scene);
+                        player.emergeFromUnderwater();
+                        camera.applyGravity = true;
+                    }
+                }
+            }
 
             if (treeManager && frameIndex % 1000) {
                 treeManager.update(camera);
