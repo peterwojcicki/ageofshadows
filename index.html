@@ -98,6 +98,7 @@
     var fog = null;
     var treeManager;
     var kelpManager;
+    var boulderManager;
 
     var createDefaultEngine = function () {
         return new BABYLON.Engine(canvas, true, {
@@ -203,7 +204,7 @@
                 var modelManager = new ModelManager(modelConfigs, scene);
 
                 kelpManager = new KelpManager(scene);
-                let boulderManager = new BoulderManager(scene);
+                boulderManager = new BoulderManager(scene);
                 treeManager = new TreeManager();
 
                 new GroundScanner(scene, ground, water, kelpManager, boulderManager, treeManager);
@@ -214,7 +215,7 @@
         water = new Water(scene, ground.getGround());
 
         new Skybox(scene);
-//        new Sound(scene, "sounds/medieval.wav");
+        new Sound(scene, "sounds/medieval.wav");
 
         return scene;
     }
@@ -289,6 +290,7 @@
             }
 
             if (treeManager && frameIndex % 1000) {
+                boulderManager.update(camera);
                 treeManager.update(camera);
                 kelpManager.update(camera, water);
             }

@@ -8,7 +8,7 @@ function GroundScanner(scene, ground, water, kelpManager, boulderManager, treeMa
             let currentGroundPosition = new BABYLON.Vector3(x, groundHeight, z);
 
             kelpManager.accept(scene, currentGroundPosition, depth);
-            //boulderManager.accept(scene, currentGroundPosition, depth);
+            boulderManager.accept(scene, currentGroundPosition, depth);
             treeManager.accept(scene, currentGroundPosition, depth);
         }
     }
