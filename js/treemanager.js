@@ -17,6 +17,14 @@ function TreeManager() {
         position: new BABYLON.Vector3(800, 0, 800),
         radius: 100
     });
+    this.woods.push({
+        position: new BABYLON.Vector3(800, 0, -800),
+        radius: 500
+    });
+    this.woods.push({
+        position: new BABYLON.Vector3(-800, 0, -800),
+        radius: 500
+    });
 
     this.visibleWoodIndex = -1;
 
