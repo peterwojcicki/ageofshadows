@@ -5,9 +5,9 @@ function Tree(scene, position, barkMaterial) {
 
 
     //Tree parameters
-    var trunk_height = 30;
+    var trunk_height = 12;
     var trunk_taper = 0.6;
-    var trunk_slices = 2;
+    var trunk_slices = 5;
     var boughs = 2; // 1 or 2
     var forks = 3;
     var fork_angle = Math.PI / 4;

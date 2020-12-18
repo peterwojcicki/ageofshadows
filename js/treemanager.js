@@ -8,23 +8,18 @@ function TreeManager() {
     this.barkMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
 
 
+    this.distanceBetweenWoods = 500;
     this.woods = [];
-    this.woods.push({
-        position: new BABYLON.Vector3(0, 0, 0),
-        radius: 300
-    });
-    this.woods.push({
-        position: new BABYLON.Vector3(800, 0, 800),
-        radius: 100
-    });
-    this.woods.push({
-        position: new BABYLON.Vector3(800, 0, -800),
-        radius: 500
-    });
-    this.woods.push({
-        position: new BABYLON.Vector3(-800, 0, -800),
-        radius: 500
-    });
+    for (let x = -4900; x < 4900; x++) {
+        for (let z = -4900; z < 4900; z++) {
+            if ((x % this.distanceBetweenWoods == 0) && (z % this.distanceBetweenWoods == 0))
+                this.woods.push({
+                    position: new BABYLON.Vector3(x, 0, z),
+                    radius: this.distanceBetweenWoods * Math.random()
+                });
+        }
+    }
+
 
     this.visibleWoodIndex = -1;
 
@@ -36,7 +31,7 @@ function TreeManager() {
 }
 
 TreeManager.prototype.accept = function (scene, groundPosition, depth) {
-    if (depth < -100) {
+    if (depth < -10) {
         this.positions.push(groundPosition.add(new BABYLON.Vector3(0, -1, 0)));
     }
 }
@@ -73,8 +68,8 @@ TreeManager.prototype.update = function (camera) {
         let wood = this.woods[i];
         let woodPosition = wood.position;
 
-        if (Math.abs(camera.position.x - woodPosition.x) < 500
-            && Math.abs(camera.position.z - woodPosition.z) < 500) {
+        if ((Math.abs(camera.position.x - woodPosition.x) < (this.distanceBetweenWoods / 2))
+            && (Math.abs(camera.position.z - woodPosition.z) < (this.distanceBetweenWoods / 2))) {
             if (i != this.visibleWoodIndex) {
 
                 window.console.log("TreeManager.update - show wood at index " + i);
