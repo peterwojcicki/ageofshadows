@@ -1,10 +1,8 @@
-function Sound(scene, path) {
+function Sound(scene, path, playInLoop) {
     var that = this;
     this.sound = new BABYLON.Sound("gemSound", path, scene,
         function () {
             that.sound.setVolume(1);
-        }, {loop: false, autoplay: true}
+        }, {loop: playInLoop, autoplay: true}
     );
-
-    //this.sound.play();
 }

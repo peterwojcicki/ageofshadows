@@ -8,14 +8,14 @@ function TreeManager() {
     this.barkMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
 
 
-    this.distanceBetweenWoods = 500;
+    this.distanceBetweenWoods = 1000;
     this.woods = [];
     for (let x = -4900; x < 4900; x++) {
         for (let z = -4900; z < 4900; z++) {
             if ((x % this.distanceBetweenWoods == 0) && (z % this.distanceBetweenWoods == 0))
                 this.woods.push({
                     position: new BABYLON.Vector3(x, 0, z),
-                    radius: this.distanceBetweenWoods * Math.random()
+                    radius: 100
                 });
         }
     }
@@ -41,11 +41,10 @@ TreeManager.prototype.showWood = function (wood) {
     let treeIndex = 0;
     for (let i = 0; i < this.positions.length; i++) {
         let currentPosition = this.positions[i];
-        if (Math.abs(currentPosition.x - woodPosition.x) < wood.radius
-            && Math.abs(currentPosition.z - woodPosition.z) < wood.radius) {
+        if (distance(currentPosition, woodPosition) < wood.radius) {
             this.trees[treeIndex].moveTo(currentPosition.clone());
 
-            window.console.log("Placing tree at " + currentPosition);
+            //window.console.log("Placing tree at " + currentPosition);
 
             treeIndex++;
 
@@ -63,23 +62,35 @@ TreeManager.prototype.hideAllTrees = function () {
     }
 }
 
-TreeManager.prototype.update = function (camera) {
+TreeManager.prototype.update = function (scene, camera) {
+
+    let closestWoodIndex = -1;
+    let smallestDistance = 1000000000;
+
     for (let i = 0; i < this.woods.length; i++) {
         let wood = this.woods[i];
         let woodPosition = wood.position;
 
-        if ((Math.abs(camera.position.x - woodPosition.x) < (this.distanceBetweenWoods / 2))
-            && (Math.abs(camera.position.z - woodPosition.z) < (this.distanceBetweenWoods / 2))) {
-            if (i != this.visibleWoodIndex) {
+        var fogEnd = scene.fogEnd;
+        if (distance(camera.position, woodPosition) - wood.radius < fogEnd){
 
-                window.console.log("TreeManager.update - show wood at index " + i);
-
-                this.hideAllTrees();
-                this.visibleWoodIndex = i;
-                this.showWood(wood);
-
-                break;
+            if (closestWoodIndex == -1) {
+                closestWoodIndex = i;
+                smallestDistance = distance(camera.position, woodPosition) - wood.radius;
+            } else if (distance(camera.position, woodPosition) - wood.radius < smallestDistance) {
+                closestWoodIndex = i;
+                smallestDistance = distance(camera.position, woodPosition) - wood.radius;
             }
+        }
+    }
+
+    if (closestWoodIndex != this.visibleWoodIndex) {
+        this.hideAllTrees();
+        this.visibleWoodIndex = closestWoodIndex;
+
+        // it might be that no wood is visible at the moment
+        if (closestWoodIndex != -1) {
+            this.showWood(this.woods[closestWoodIndex]);
         }
     }
 }

@@ -5,7 +5,7 @@ function Tree(scene, position, barkMaterial) {
 
 
     //Tree parameters
-    var trunk_height = 12;
+    var trunk_height = 12 + Math.random() * 8;
     var trunk_taper = 0.6;
     var trunk_slices = 5;
     var boughs = 2; // 1 or 2
@@ -13,10 +13,10 @@ function Tree(scene, position, barkMaterial) {
     var fork_angle = Math.PI / 4;
     var fork_ratio = 2 / (1 + Math.sqrt(5)); //PHI the golden ratio
     var branch_angle = Math.PI / 3;
-    var bow_freq = 2;
+    var bow_freq = 2 + Math.floor(Math.random() * 2);
     var bow_height = 3.5;
-    var branches = 2;
-    var leaves_on_branch = 3;
+    var branches = 2 + Math.floor(Math.random() * 5);
+    var leaves_on_branch = 3 + Math.floor(Math.random() * 2);
     var leaf_wh_ratio = 0.5;
 
     this.tree = createTree(trunk_height, trunk_taper, trunk_slices, barkMaterial, boughs, forks, fork_angle, fork_ratio, branches, branch_angle, bow_freq, bow_height, leaves_on_branch, leaf_wh_ratio, green, scene);

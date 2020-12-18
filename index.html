@@ -215,7 +215,7 @@
         water = new Water(scene, ground.getGround());
 
         new Skybox(scene);
-        new Sound(scene, "sounds/medieval.wav");
+        new Sound(scene, "sounds/medieval.wav", true);
 
         return scene;
     }
@@ -277,7 +277,7 @@
                     if (!player.isUnderwater()) {
                         fog.enableUnderwaterFog(scene);
                         player.goUnderwater();
-                        new Sound(scene, "sounds/splash.wav");
+                        new Sound(scene, "sounds/splash.wav", false);
                         camera.applyGravity = false;
                     }
                 } else {
@@ -291,11 +291,16 @@
 
             if (treeManager && frameIndex % 1000) {
                 boulderManager.update(camera);
-                treeManager.update(camera);
+                treeManager.update(scene, camera);
                 kelpManager.update(camera, water);
             }
         }
     });
+
+    // distance between 2 points on a horizontal plane
+    window.distance = function (vector1, vector2) {
+        return Math.sqrt((vector1.x - vector2.x) * (vector1.x - vector2.x) + (vector1.z - vector2.z) * (vector1.z - vector2.z))
+    }
 
     // Resize
     window.addEventListener("resize", function () {
