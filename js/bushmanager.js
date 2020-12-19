@@ -12,12 +12,15 @@ function BushManager(scene) {
     this.furMaterial.furGravity = new BABYLON.Vector3(0, -0.3, 0);
 
     this.positions = [];
-    this.positionsWithBush = [];
-    this.bushs = [];
+
+    this.bushes = [];
+    for (let i = 0; i < 50; i++) {
+        this.bushes.push(new Bush(new BABYLON.Vector3(-100000, -10000, -100000), 0.1, this.furMaterial));
+    }
 }
 
 BushManager.prototype.accept = function (scene, groundPosition, depth) {
-    if (depth < -10 && depth > -350) {
+    if (depth < -10 && depth > -300) {
         this.positions.push(groundPosition.add(new BABYLON.Vector3(0, 0, 0)));
     }
 }
@@ -30,18 +33,28 @@ BushManager.prototype.update = function (camera) {
         if (distance(camera.position, bushPosition) < scene.fogEnd) {
 
             if (!this.bushExistsAtPosition(bushPosition)) {
-                window.console.log("BushManager.update - show bush at position " + bushPosition);
-                this.bushs.push(new Bush(bushPosition, 0.1, this.furMaterial));
-                this.positionsWithBush.push(bushPosition);
+
+                // find a bush which is out of sight
+                for (let bushIndex = 0; bushIndex < this.bushes.length; bushIndex++) {
+                    let bush = this.bushes[bushIndex];
+
+                    if (distance(camera.position, bush.getPosition()) > scene.fogEnd) {
+                        bush.moveTo(bushPosition);
+
+                        window.console.log("BushManager.update - moving bush to position " + bushPosition);
+
+                        break;
+                    }
+                }
             }
         }
     }
 }
 
 BushManager.prototype.bushExistsAtPosition = function (position) {
-    for (let i = 0; i < this.positionsWithBush.length; i++) {
-        let positionWithBush = this.positionsWithBush[i];
-        if ((positionWithBush.x == position.x) && (positionWithBush.z == position.z)) {
+    for (let bushIndex = 0; bushIndex < this.bushes.length; bushIndex++) {
+        let bush = this.bushes[bushIndex];
+        if ((bush.getPosition().x == position.x) && (bush.getPosition().z == position.z)) {
             return true;
         }
     }

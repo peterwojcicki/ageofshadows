@@ -1,16 +1,21 @@
 function GroundScanner(scene, ground, water, kelpManager, boulderManager, treeManager, bushManager) {
 
-    let step = 30;
+    let stepBase = 30;
+    let step = stepBase + 10 * Math.random();
 
     let xIteration = 0;
     let zIteration = 0;
 
-    for (var x = -4900; x < 4900; x += step) {
+    for (var x = -4900; x < 4900; x += stepBase) {
+
+        step = stepBase + 10 * Math.random();
 
         xIteration++;
         zIteration = 0;
 
-        for (var z = -4900; z < 4900; z += step) {
+        for (var z = -4900; z < 4900; z += stepBase) {
+
+            step = stepBase + 10 * Math.random();
 
             zIteration++
 

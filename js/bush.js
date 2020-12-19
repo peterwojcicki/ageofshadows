@@ -10,3 +10,10 @@ function Bush(position, radius, material) {
     var shells = BABYLON.FurMaterial.FurifyMesh(this.mesh, quality);
 }
 
+Bush.prototype.getPosition = function () {
+    return this.mesh.position;
+}
+
+Bush.prototype.moveTo = function (newPosition) {
+    this.mesh.position = newPosition;
+}
