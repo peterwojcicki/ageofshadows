@@ -38,6 +38,8 @@
     <script src="js/groundscanner.js"></script>
     <script src="js/tree.js"></script>
     <script src="js/treemanager.js"></script>
+    <script src="js/bush.js"></script>
+    <script src="js/bushmanager.js"></script>
 
     <style>
         html, body {
@@ -99,6 +101,7 @@
     var treeManager;
     var kelpManager;
     var boulderManager;
+    var bushManager;
 
     var createDefaultEngine = function () {
         return new BABYLON.Engine(canvas, true, {
@@ -205,9 +208,10 @@
 
                 kelpManager = new KelpManager(scene);
                 boulderManager = new BoulderManager(scene);
+                bushManager = new BushManager(scene);
                 treeManager = new TreeManager();
 
-                new GroundScanner(scene, ground, water, kelpManager, boulderManager, treeManager);
+                new GroundScanner(scene, ground, water, kelpManager, boulderManager, treeManager, bushManager);
             });
         }
 
@@ -291,6 +295,7 @@
 
             if (treeManager && frameIndex % 1000) {
                 boulderManager.update(camera);
+                bushManager.update(camera);
                 treeManager.update(scene, camera);
                 kelpManager.update(camera, water);
             }
