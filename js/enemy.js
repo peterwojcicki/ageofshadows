@@ -26,13 +26,15 @@ Enemy.prototype.hit = function (projectile) {
     }
 }
 
-Enemy.prototype.move = function () {
+Enemy.prototype.move = function (camera) {
     if (this.isActive) {
-        if (distance3d(this.mesh.position, this.targetPosition) < 5 * this.radius) {
+        if (distance3d(this.mesh.position, camera.position) < 60) {
+            // chase player
+            this.followPlayer(camera);
+        } else if (distance3d(this.mesh.position, this.targetPosition) < 5 * this.radius) {
             this.resetDirection();
-        } else {
-            this.mesh.position.addInPlace(this.direction);
         }
+        this.mesh.position.addInPlace(this.direction);
     }
 }
 
@@ -45,5 +47,13 @@ Enemy.prototype.resetDirection = function () {
     this.targetPosition = new BABYLON.Vector3(this.mesh.position.x + deltaX, y + this.radius, this.mesh.position.z + deltaZ);
 
     let speed = 0.1;
+    this.direction = this.targetPosition.subtract(this.mesh.position).normalize().multiplyByFloats(speed, speed, speed);
+}
+
+Enemy.prototype.followPlayer = function (camera) {
+
+    this.targetPosition = camera.position.clone();
+
+    let speed = 0.3;
     this.direction = this.targetPosition.subtract(this.mesh.position).normalize().multiplyByFloats(speed, speed, speed);
 }

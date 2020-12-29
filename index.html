@@ -321,8 +321,8 @@
                 projectileManager.update();
             }
 
-            if (enemyManager && projectileManager) {
-                enemyManager.checkIfHit(projectileManager);
+            if (enemyManager && projectileManager && camera) {
+                enemyManager.checkIfHit(projectileManager, camera);
             }
         }
     });
