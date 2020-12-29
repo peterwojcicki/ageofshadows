@@ -8,10 +8,13 @@ function Enemy(position, radius, material) {
 
 Enemy.prototype.die = function() {
     this.mesh.setEnabled(false);
+
+    new Sound(scene, "sounds/creatures/man_die_1.wav", false);
 }
 
 Enemy.prototype.hit = function(projectile) {
     if (distance3d(projectile.getPosition(), this.mesh.position) <= this.radius) {
         this.die();
+        projectile.deactivate();
     }
 }

@@ -41,3 +41,16 @@ EnemyManager.prototype.enemyExistsAtPosition = function (position) {
     }
     return false;
 }
+
+EnemyManager.prototype.checkIfHit = function (projectileManager) {
+
+    let projectiles = projectileManager.getProjectiles();
+
+    for (let i = 0; i < this.enemys.length; i++) {
+        let enemy = this.enemys[i];
+
+        for (let j = 0; j < projectiles.length; j++) {
+            enemy.hit(projectiles[j]);
+        }
+    }
+}

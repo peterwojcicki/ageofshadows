@@ -42,6 +42,8 @@
     <script src="js/bushmanager.js"></script>
     <script src="js/enemy.js"></script>
     <script src="js/enemymanager.js"></script>
+    <script src="js/projectile.js"></script>
+    <script src="js/projectilemanager.js"></script>
 
     <style>
         html, body {
@@ -103,6 +105,7 @@
     var treeManager;
     var kelpManager;
     var boulderManager;
+    var projectileManager;
     var enemyManager;
     var bushManager;
 
@@ -124,6 +127,13 @@
                 canvas.requestPointerLock = canvas.requestPointerLock || canvas.msRequestPointerLock || canvas.mozRequestPointerLock || canvas.webkitRequestPointerLock;
                 if (canvas.requestPointerLock) {
                     canvas.requestPointerLock();
+                }
+            } else {
+                window.console.log("click");
+
+                if (projectileManager && camera) {
+                    window.console.log("shoot");
+                    projectileManager.shoot(camera);
                 }
             }
 
@@ -211,6 +221,7 @@
 
                 kelpManager = new KelpManager(scene);
                 boulderManager = new BoulderManager(scene);
+                projectileManager = new ProjectileManager(scene);
                 enemyManager = new EnemyManager(scene);
                 bushManager = new BushManager(scene);
                 treeManager = new TreeManager();
@@ -303,6 +314,15 @@
                 bushManager.update(camera);
                 treeManager.update(scene, camera);
                 kelpManager.update(camera, water);
+
+                projectileManager.refreshProjectiles();
+            }
+            if (projectileManager) {
+                projectileManager.update();
+            }
+
+            if (enemyManager && projectileManager) {
+                enemyManager.checkIfHit(projectileManager);
             }
         }
     });
@@ -313,7 +333,7 @@
     }
 
     window.distance3d = function (vector1, vector2) {
-        return Math.sqrt((vector1.x - vector2.x) * (vector1.x - vector2.x) + (vector1.z - vector2.z) * (vector1.z - vector2.z) +  (vector1.y - vector2.y) * (vector1.y - vector2.y))
+        return Math.sqrt((vector1.x - vector2.x) * (vector1.x - vector2.x) + (vector1.z - vector2.z) * (vector1.z - vector2.z) + (vector1.y - vector2.y) * (vector1.y - vector2.y))
     }
 
     // Resize
