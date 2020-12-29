@@ -15,7 +15,7 @@ EnemyManager.prototype.accept = function (scene, groundPosition, depth) {
     }
 }
 
-EnemyManager.prototype.update = function (camera) {
+EnemyManager.prototype.update = function (camera, ground) {
     for (let i = 0; i < this.positions.length; i++) {
 
         let enemyPosition = this.positions[i];
@@ -25,7 +25,7 @@ EnemyManager.prototype.update = function (camera) {
 
             if (!this.enemyExistsAtPosition(enemyPosition)) {
                 window.console.log("EnemyManager.update - show enemy at position " + enemyPosition);
-                this.enemys.push(new Enemy(enemyPosition, 2.0, this.mat));
+                this.enemys.push(new Enemy(enemyPosition, 2.0, this.mat, ground));
                 this.positionsWithEnemy.push(enemyPosition);
             }
         }
@@ -48,6 +48,8 @@ EnemyManager.prototype.checkIfHit = function (projectileManager) {
 
     for (let i = 0; i < this.enemys.length; i++) {
         let enemy = this.enemys[i];
+
+        enemy.move();
 
         for (let j = 0; j < projectiles.length; j++) {
             enemy.hit(projectiles[j]);

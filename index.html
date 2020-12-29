@@ -309,7 +309,7 @@
             }
 
             if (treeManager && frameIndex % 1000) {
-                enemyManager.update(camera);
+                enemyManager.update(camera, ground);
                 boulderManager.update(camera);
                 bushManager.update(camera);
                 treeManager.update(scene, camera);
