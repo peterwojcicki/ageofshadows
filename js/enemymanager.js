@@ -10,7 +10,7 @@ function EnemyManager(scene) {
 }
 
 EnemyManager.prototype.accept = function (scene, groundPosition, depth) {
-    if (depth < 100) {
+    if (depth < -100) {
         this.positions.push(groundPosition.add(new BABYLON.Vector3(0, 2.0, 0)));
     }
 }
