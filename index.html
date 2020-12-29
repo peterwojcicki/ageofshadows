@@ -40,6 +40,8 @@
     <script src="js/treemanager.js"></script>
     <script src="js/bush.js"></script>
     <script src="js/bushmanager.js"></script>
+    <script src="js/enemy.js"></script>
+    <script src="js/enemymanager.js"></script>
 
     <style>
         html, body {
@@ -101,6 +103,7 @@
     var treeManager;
     var kelpManager;
     var boulderManager;
+    var enemyManager;
     var bushManager;
 
     var createDefaultEngine = function () {
@@ -208,10 +211,11 @@
 
                 kelpManager = new KelpManager(scene);
                 boulderManager = new BoulderManager(scene);
+                enemyManager = new EnemyManager(scene);
                 bushManager = new BushManager(scene);
                 treeManager = new TreeManager();
 
-                new GroundScanner(scene, ground, water, kelpManager, boulderManager, treeManager, bushManager);
+                new GroundScanner(scene, ground, water, kelpManager, boulderManager, treeManager, bushManager, enemyManager);
             });
         }
 
@@ -294,6 +298,7 @@
             }
 
             if (treeManager && frameIndex % 1000) {
+                enemyManager.update(camera);
                 boulderManager.update(camera);
                 bushManager.update(camera);
                 treeManager.update(scene, camera);
@@ -305,6 +310,10 @@
     // distance between 2 points on a horizontal plane
     window.distance = function (vector1, vector2) {
         return Math.sqrt((vector1.x - vector2.x) * (vector1.x - vector2.x) + (vector1.z - vector2.z) * (vector1.z - vector2.z))
+    }
+
+    window.distance3d = function (vector1, vector2) {
+        return Math.sqrt((vector1.x - vector2.x) * (vector1.x - vector2.x) + (vector1.z - vector2.z) * (vector1.z - vector2.z) +  (vector1.y - vector2.y) * (vector1.y - vector2.y))
     }
 
     // Resize
