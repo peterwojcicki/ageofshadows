@@ -2,6 +2,7 @@ function Player(scene, camera) {
     this.underwater = false;
     this.camera = camera;
     this.health = 100;
+    this.kills = 0;
 }
 
 Player.prototype.moveUp = function (camera) {
@@ -46,6 +47,22 @@ Player.prototype.decreaseHealth = function () {
     }
 }
 
+Player.prototype.increaseHealth = function () {
+    this.health = this.health + 20;
+    if (this.health > 100) {
+        this.health = 100;
+    }
+}
+
+
 Player.prototype.getHealth = function () {
     return this.health;
+}
+
+Player.prototype.increaseKills = function () {
+    this.kills = this.kills + 1;
+}
+
+Player.prototype.getKills = function () {
+    return this.kills;
 }

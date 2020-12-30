@@ -1,4 +1,4 @@
-function Enemy(position, radius, defaultMaterial, alertedMaterial, ground, projectileManager) {
+function Enemy(position, radius, defaultMaterial, alertedMaterial, ground, projectileManager, player) {
     this.mesh = BABYLON.MeshBuilder.CreateSphere("sphere", {segments: 10, diameter: radius * 2.0});
     this.mesh.position = position;
     this.mesh.material = defaultMaterial;
@@ -12,6 +12,7 @@ function Enemy(position, radius, defaultMaterial, alertedMaterial, ground, proje
     this.isActive = true;
 
     this.lastAttactAt = 0;
+    this.player = player;
 
     this.resetDirection();
 }
@@ -28,6 +29,9 @@ Enemy.prototype.hit = function (projectile) {
         if (distance3d(projectile.getPosition(), this.mesh.position) <= this.radius) {
             this.die();
             projectile.deactivate();
+
+            this.player.increaseKills();
+            this.player.increaseHealth();
         }
     }
 }

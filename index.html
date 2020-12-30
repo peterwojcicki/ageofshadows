@@ -129,6 +129,18 @@
             border-radius: 0px 5px 5px 0px;
         }
 
+        .kills {
+            position: fixed;
+            top: 50px;
+            left: 100px;
+
+            width: 0px;
+            height: 20px;
+            background-image: url("img/menu/kills.png");
+            background-repeat: repeat-x;
+            border-radius: 0px 5px 5px 0px;
+        }
+
         .map {
             position: fixed;
             top: 20px;
@@ -163,6 +175,7 @@
 
 <div id="head" class="head"></div>
 <div id="life" class="life"></div>
+<div id="kills" class="kills"></div>
 <div id="map" class="map">
     <div id="player-dot" class="player-dot"/>
 </div>
@@ -401,7 +414,7 @@
             }
 
             if (treeManager && frameIndex % 1000) {
-                enemyManager.update(camera, ground, projectileManager);
+                enemyManager.update(camera, ground, projectileManager, player);
                 boulderManager.update(camera);
                 bushManager.update(camera);
                 treeManager.update(scene, camera);
@@ -411,7 +424,7 @@
 
                 updateCompass();
                 updatePlayerPositionOnMap();
-                updateHealthBar();
+                updatePlayerBars();
             }
             if (projectileManager) {
                 projectileManager.update();
@@ -460,10 +473,13 @@
         }
     }
 
-    var updateHealthBar = function () {
+    var updatePlayerBars = function () {
         if (player) {
             let newWidth = 200.0 * (player.getHealth() / 100.0) + "px";
             window.document.getElementById("life").setAttribute("style","width:" + newWidth);
+
+            let newKillsWidth = (10.0 * player.getKills()) + "px";
+            window.document.getElementById("kills").setAttribute("style","width:" + newKillsWidth);
         }
     }
 </script>

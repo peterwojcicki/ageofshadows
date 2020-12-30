@@ -20,7 +20,7 @@ EnemyManager.prototype.accept = function (scene, groundPosition, depth) {
     }
 }
 
-EnemyManager.prototype.update = function (camera, ground, projectileManager) {
+EnemyManager.prototype.update = function (camera, ground, projectileManager, player) {
     for (let i = 0; i < this.positions.length; i++) {
 
         let enemyPosition = this.positions[i];
@@ -30,7 +30,7 @@ EnemyManager.prototype.update = function (camera, ground, projectileManager) {
 
             if (!this.enemyExistsAtPosition(enemyPosition)) {
                 window.console.log("EnemyManager.update - show enemy at position " + enemyPosition);
-                this.enemys.push(new Enemy(enemyPosition, 2.0, this.defaultMaterial, this.alertedMaterial, ground, projectileManager));
+                this.enemys.push(new Enemy(enemyPosition, 2.0, this.defaultMaterial, this.alertedMaterial, ground, projectileManager, player));
                 this.positionsWithEnemy.push(enemyPosition);
             }
         }
