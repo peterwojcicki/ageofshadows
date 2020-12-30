@@ -67,8 +67,8 @@
             text-align: center;
             font-size: 16px;
             color: white;
-            top: 15px;
-            right: 10px;
+            top: 20px;
+            right: 200px;
             width: 60px;
             height: 20px;
         }
@@ -127,6 +127,29 @@
             background-repeat: repeat-x;
             border-radius: 0px 5px 5px 0px;
         }
+
+        .map {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+
+            width: 160px;
+            height: 160px;
+            background-image: url("img/heightmap_for_map.jpg");
+            background-repeat: no-repeat;
+            border-radius: 30px;
+        }
+
+        .player-dot {
+            position: relative;
+            top: 80px;
+            left: 80px;
+
+            width: 8px;
+            height: 8px;
+            background: #49ce0d;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
@@ -139,6 +162,9 @@
 
 <div id="head" class="head"></div>
 <div id="life" class="life"></div>
+<div id="map" class="map">
+    <div id="player-dot" class="player-dot"/>
+</div>
 
 <div id="crosshair" class="crosshair"></div>
 
@@ -383,6 +409,7 @@
                 projectileManager.refreshProjectiles();
 
                 updateCompass();
+                updatePlayerPositionOnMap();
             }
             if (projectileManager) {
                 projectileManager.update();
@@ -411,6 +438,22 @@
     var updateCompass = function () {
         if (camera) {
             window.document.getElementById("compass").style.transform = "rotate(" + camera.rotation.y + "rad)";
+        }
+    }
+
+    var updatePlayerPositionOnMap = function () {
+        if (camera) {
+            let mapWidth = window.document.getElementById("map").clientHeight;
+            let terrainWidth = 10000;
+
+            let newX = camera.position.x + (terrainWidth / 2.0);
+            let newY = terrainWidth - (camera.position.z + (terrainWidth / 2.0));
+
+            newX = mapWidth * (newX / terrainWidth);
+            newY = mapWidth * (newY / terrainWidth);
+
+            window.document.getElementById("player-dot").style.left = newX + "px";
+            window.document.getElementById("player-dot").style.top = newY + "px";
         }
     }
 </script>
