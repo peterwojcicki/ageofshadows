@@ -1,8 +1,13 @@
 function EnemyManager(scene) {
-    this.mat = new BABYLON.StandardMaterial("enemy", scene);
-    this.mat.diffuseColor = new BABYLON.Color3(1, 0, 0);
-    this.mat.ambientColor = new BABYLON.Color3(1, 0, 0);
-    this.mat.specularColor = new BABYLON.Color3(1, 0, 0);
+    this.defaultMaterial = new BABYLON.StandardMaterial("defaultMaterial", scene);
+    this.defaultMaterial.diffuseColor = new BABYLON.Color3(0, 0, 1);
+    this.defaultMaterial.ambientColor = new BABYLON.Color3(0, 0, 1);
+    this.defaultMaterial.specularColor = new BABYLON.Color3(0, 0, 1);
+
+    this.alertedMaterial = new BABYLON.StandardMaterial("alertedMaterial", scene);
+    this.alertedMaterial.diffuseColor = new BABYLON.Color3(1, 0, 0);
+    this.alertedMaterial.ambientColor = new BABYLON.Color3(1, 0, 0);
+    this.alertedMaterial.specularColor = new BABYLON.Color3(1, 0, 0);
 
     this.positions = [];
     this.positionsWithEnemy = [];
@@ -10,7 +15,7 @@ function EnemyManager(scene) {
 }
 
 EnemyManager.prototype.accept = function (scene, groundPosition, depth) {
-    if (depth < -100) {
+    if (depth < -10 && depth > -200) {
         this.positions.push(groundPosition.add(new BABYLON.Vector3(0, 2.0, 0)));
     }
 }
@@ -20,12 +25,12 @@ EnemyManager.prototype.update = function (camera, ground) {
 
         let enemyPosition = this.positions[i];
 
-        if (Math.abs(camera.position.x - enemyPosition.x) < 100
-            && Math.abs(camera.position.z - enemyPosition.z) < 100) {
+        if (Math.abs(camera.position.x - enemyPosition.x) < 400
+            && Math.abs(camera.position.z - enemyPosition.z) < 400) {
 
             if (!this.enemyExistsAtPosition(enemyPosition)) {
                 window.console.log("EnemyManager.update - show enemy at position " + enemyPosition);
-                this.enemys.push(new Enemy(enemyPosition, 2.0, this.mat, ground));
+                this.enemys.push(new Enemy(enemyPosition, 2.0, this.defaultMaterial, this.alertedMaterial, ground));
                 this.positionsWithEnemy.push(enemyPosition);
             }
         }

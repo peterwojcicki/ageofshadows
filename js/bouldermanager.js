@@ -1,7 +1,7 @@
 function BoulderManager(scene) {
-    this.mat = new BABYLON.StandardMaterial("boulder", scene);
-    this.mat.diffuseTexture = new BABYLON.Texture("img/underwater_rock.jpg", scene);
-    this.mat.specularColor = new BABYLON.Color3(0, 0, 0);
+    this.defaultMaterial = new BABYLON.StandardMaterial("boulder", scene);
+    this.defaultMaterial.diffuseTexture = new BABYLON.Texture("img/underwater_rock.jpg", scene);
+    this.defaultMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
 
     this.positions = [];
     this.positionsWithBoulder = [];
@@ -24,7 +24,7 @@ BoulderManager.prototype.update = function (camera) {
 
             if (!this.boulderExistsAtPosition(boulderPosition)) {
                 window.console.log("BoulderManager.update - show boulder at position " + boulderPosition);
-                this.boulders.push(new Boulder(boulderPosition, 5.0 * Math.random(), this.mat));
+                this.boulders.push(new Boulder(boulderPosition, 5.0 * Math.random(), this.defaultMaterial));
                 this.positionsWithBoulder.push(boulderPosition);
             }
         }

@@ -90,6 +90,20 @@
             background-image: url("img/compass_small.png");
             background-repeat: no-repeat;
         }
+
+        .crosshair {
+            position: fixed; /* or absolute */
+            top: 50%;
+            left: 50%;
+
+            width: 126px;
+            height: 126px;
+            background-image: url("img/weapons/crosshair_1.png");
+            background-repeat: no-repeat;
+
+            margin-top: -63px;
+            margin-left: -63px;
+        }
     </style>
 </head>
 <body>
@@ -99,6 +113,8 @@
 <div id="menu">
     <div id="compass" class="compass"></div>
 </div>
+
+<div id="crosshair" class="crosshair"></div>
 
 <script>
     var canvas = document.getElementById("renderCanvas");

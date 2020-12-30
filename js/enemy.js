@@ -1,7 +1,10 @@
-function Enemy(position, radius, material, ground) {
+function Enemy(position, radius, defaultMaterial, alertedMaterial, ground) {
     this.mesh = BABYLON.MeshBuilder.CreateSphere("sphere", {segments: 10, diameter: radius * 2.0});
     this.mesh.position = position;
-    this.mesh.material = material;
+    this.mesh.material = defaultMaterial;
+
+    this.defaultMaterial = defaultMaterial;
+    this.alertedMaterial = alertedMaterial;
 
     this.radius = radius;
     this.ground = ground;
@@ -39,6 +42,9 @@ Enemy.prototype.move = function (camera) {
 }
 
 Enemy.prototype.resetDirection = function () {
+
+    this.mesh.material = this.defaultMaterial;
+
     let factor = 30.0;
     let deltaX = factor * (-1.0 + 2.0 * Math.random());
     let deltaZ = factor * (-1.0 + 2.0 * Math.random());
@@ -51,6 +57,8 @@ Enemy.prototype.resetDirection = function () {
 }
 
 Enemy.prototype.followPlayer = function (camera) {
+
+    this.mesh.material = this.alertedMaterial;
 
     this.targetPosition = camera.position.clone();
 

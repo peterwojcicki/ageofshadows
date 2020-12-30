@@ -6,14 +6,14 @@ function GroundScanner(scene, ground, water, kelpManager, boulderManager, treeMa
     let xIteration = 0;
     let zIteration = 0;
 
-    for (var x = -4900; x < 4900; x += stepBase) {
+    for (var x = -4900; x < 4900; x += step) {
 
         step = stepBase + 10 * Math.random();
 
         xIteration++;
         zIteration = 0;
 
-        for (var z = -4900; z < 4900; z += stepBase) {
+        for (var z = -4900; z < 4900; z += step) {
 
             step = stepBase + 10 * Math.random();
 
@@ -32,7 +32,7 @@ function GroundScanner(scene, ground, water, kelpManager, boulderManager, treeMa
                 bushManager.accept(scene, currentGroundPosition, depth);
             }
 
-            if ((xIteration % 3 == 0) && (zIteration % 3 == 0)) {
+            if ((xIteration % 7 == 0) && (zIteration % 7 == 0)) {
                 enemyManager.accept(scene, currentGroundPosition, depth);
             }
         }
