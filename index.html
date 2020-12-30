@@ -104,6 +104,29 @@
             margin-top: -63px;
             margin-left: -63px;
         }
+
+        .head {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+
+            width: 74px;
+            height: 180px;
+            background-image: url("img/menu/head.png");
+            background-repeat: no-repeat;
+        }
+
+        .life {
+            position: fixed;
+            top: 20px;
+            left: 100px;
+
+            width: 200px;
+            height: 20px;
+            background-image: url("img/menu/life.png");
+            background-repeat: repeat-x;
+            border-radius: 0px 5px 5px 0px;
+        }
     </style>
 </head>
 <body>
@@ -113,6 +136,9 @@
 <div id="menu">
     <div id="compass" class="compass"></div>
 </div>
+
+<div id="head" class="head"></div>
+<div id="life" class="life"></div>
 
 <div id="crosshair" class="crosshair"></div>
 
@@ -273,7 +299,7 @@
         water = new Water(scene, ground.getGround());
 
         new Skybox(scene);
-        new Sound(scene, "sounds/medieval.wav", true);
+//        new Sound(scene, "sounds/medieval.wav", true);
 
         return scene;
     }
