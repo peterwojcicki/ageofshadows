@@ -32,7 +32,7 @@ function GroundScanner(scene, ground, water, kelpManager, boulderManager, treeMa
                 bushManager.accept(scene, currentGroundPosition, depth);
             }
 
-            if ((xIteration % 7 == 0) && (zIteration % 7 == 0)) {
+            if ((xIteration % 9 == 0) && (zIteration % 9 == 0)) {
                 enemyManager.accept(scene, currentGroundPosition, depth);
             }
         }
