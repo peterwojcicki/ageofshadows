@@ -1,4 +1,4 @@
-function Projectile(position, radius, material, direction) {
+function Projectile(position, radius, material, direction, shooter) {
     this.mesh = BABYLON.MeshBuilder.CreateSphere("projectile", {segments: 5, diameter: radius * 2.0});
     this.mesh.position = position;
     this.mesh.material = material;
@@ -8,6 +8,8 @@ function Projectile(position, radius, material, direction) {
     this.active = true;
     this.initialPosition = position.clone();
     this.range = 300;
+
+    this.shooter = shooter;
 }
 
 Projectile.prototype.move = function () {
@@ -31,4 +33,8 @@ Projectile.prototype.isActive = function () {
 
 Projectile.prototype.getPosition = function () {
     return this.mesh.position;
+}
+
+Projectile.prototype.getShooter = function () {
+    return this.shooter;
 }

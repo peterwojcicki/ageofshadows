@@ -257,8 +257,6 @@
         new BABYLON.DirectionalLight("Omni", new BABYLON.Vector3(-2, -5, 2), scene);
         new BABYLON.PointLight("Omni2", new BABYLON.Vector3(2, -5, -2), scene);
 
-        player = new Player(scene);
-
         camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 200, 50), scene);
         camera.attachControl(canvas, true);
         camera.angularsensibility *= -0.3;
@@ -269,6 +267,8 @@
         camera.minZ = 0.01;
         camera.checkCollisions = true;
         camera.applyGravity = true;
+
+        player = new Player(scene, camera);
 
 
         scene.gravity = new BABYLON.Vector3(0, -0.9, 0);
@@ -401,7 +401,7 @@
             }
 
             if (treeManager && frameIndex % 1000) {
-                enemyManager.update(camera, ground);
+                enemyManager.update(camera, ground, projectileManager);
                 boulderManager.update(camera);
                 bushManager.update(camera);
                 treeManager.update(scene, camera);
@@ -411,6 +411,7 @@
 
                 updateCompass();
                 updatePlayerPositionOnMap();
+                updateHealthBar();
             }
             if (projectileManager) {
                 projectileManager.update();
@@ -418,6 +419,7 @@
 
             if (enemyManager && projectileManager && camera) {
                 enemyManager.checkIfHit(projectileManager, camera);
+                player.checkIfHit(projectileManager);
             }
         }
     });
@@ -455,6 +457,13 @@
 
             window.document.getElementById("player-dot").style.left = newX + "px";
             window.document.getElementById("player-dot").style.top = newY + "px";
+        }
+    }
+
+    var updateHealthBar = function () {
+        if (player) {
+            let newWidth = 200.0 * (player.getHealth() / 100.0) + "px";
+            window.document.getElementById("life").setAttribute("style","width:" + newWidth);
         }
     }
 </script>

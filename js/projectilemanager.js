@@ -8,11 +8,15 @@ function ProjectileManager(scene) {
 }
 
 ProjectileManager.prototype.shoot = function (camera) {
-    let cameraDirection = BABYLON.Ray.CreateNewFromTo(camera.position, camera.getTarget()).direction;
+    this.shootFromTo(camera.position, camera.getTarget(), camera);
+}
+
+ProjectileManager.prototype.shootFromTo = function (from, to, shooter) {
+    let cameraDirection = BABYLON.Ray.CreateNewFromTo(from, to).direction;
 
     let speed = 3.0;
     let normalisedDirection = cameraDirection.normalizeToNew().multiplyByFloats(speed, speed, speed);
-    this.projectiles.push(new Projectile(camera.position.clone(), 0.1, this.defaultMaterial, normalisedDirection));
+    this.projectiles.push(new Projectile(from.clone(), 0.1, this.defaultMaterial, normalisedDirection, shooter));
 
     new Sound(scene, "sounds/weapons/arrow.wav", false);
 }
