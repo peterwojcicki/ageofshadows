@@ -24,7 +24,7 @@ Fog.prototype.enableLandFog = function (scene) {
     scene.fogMode = BABYLON.Scene.FOGMODE_LINEAR;
     scene.fogColor = new BABYLON.Color3(0.9, 0.9, 0.85);
     scene.fogDensity = 0.01;
-    scene.fogStart = 1.0;
+    scene.fogStart = 100.0;
     scene.fogEnd = 500.0;
 
 }
