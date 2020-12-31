@@ -15,7 +15,7 @@ function Water(scene, ground) {
     this.waterMesh.position = new BABYLON.Vector3(0, 90, 0);
 }
 
-Water.prototype.getPosition = function (camera) {
+Water.prototype.getPosition = function () {
     return this.waterMesh.position;
 }
 

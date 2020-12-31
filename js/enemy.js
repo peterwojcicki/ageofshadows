@@ -1,4 +1,4 @@
-function Enemy(position, radius, defaultMaterial, alertedMaterial, ground, projectileManager, player) {
+function Enemy(position, radius, defaultMaterial, alertedMaterial, ground, projectileManager, player, water) {
     this.mesh = BABYLON.MeshBuilder.CreateSphere("sphere", {segments: 10, diameter: radius * 2.0});
     this.mesh.position = position;
     this.mesh.material = defaultMaterial;
@@ -13,6 +13,7 @@ function Enemy(position, radius, defaultMaterial, alertedMaterial, ground, proje
 
     this.lastAttactAt = 0;
     this.player = player;
+    this.water = water;
 
     this.resetDirection();
 }
@@ -64,9 +65,15 @@ Enemy.prototype.resetDirection = function () {
     this.mesh.material = this.defaultMaterial;
 
     let factor = 30.0;
-    let deltaX = factor * (-1.0 + 2.0 * Math.random());
-    let deltaZ = factor * (-1.0 + 2.0 * Math.random());
-    let y = this.ground.getHeightAtCoordinates(this.mesh.position.x + deltaX, this.mesh.position.z + deltaZ);
+
+    let deltaX = 0;
+    let deltaZ = 0;
+    let y = -100000;
+    do {
+        deltaX = factor * (-1.0 + 2.0 * Math.random());
+        deltaZ = factor * (-1.0 + 2.0 * Math.random());
+        y = this.ground.getHeightAtCoordinates(this.mesh.position.x + deltaX, this.mesh.position.z + deltaZ);
+    } while (y <= this.water.getPosition().y);
 
     this.targetPosition = new BABYLON.Vector3(this.mesh.position.x + deltaX, y + this.radius, this.mesh.position.z + deltaZ);
 
@@ -78,7 +85,8 @@ Enemy.prototype.followPlayer = function (camera) {
 
     this.mesh.material = this.alertedMaterial;
 
-    this.targetPosition = camera.position.clone();
+    let enemyY = this.ground.getHeightAtCoordinates(camera.position.x, camera.position.z);
+    this.targetPosition = new BABYLON.Vector3(camera.position.x, enemyY + this.radius, camera.position.z);
 
     let speed = 0.6;
     this.direction = this.targetPosition.subtract(this.mesh.position).normalize().multiplyByFloats(speed, speed, speed);
