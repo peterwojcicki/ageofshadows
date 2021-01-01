@@ -10,7 +10,7 @@ KelpManager.prototype.accept = function (scene, groundPosition, depth) {
     }
 }
 
-KelpManager.prototype.update = function (camera, water) {
+KelpManager.prototype.update = function (scene, camera, water) {
     for (let i = 0; i < this.positions.length; i++) {
 
         let kelpPosition = this.positions[i];

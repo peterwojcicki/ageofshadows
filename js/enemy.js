@@ -66,14 +66,16 @@ Enemy.prototype.resetDirection = function () {
 
     let factor = 30.0;
 
-    let deltaX = 0;
-    let deltaZ = 0;
-    let y = -100000;
-    do {
-        deltaX = factor * (-1.0 + 2.0 * Math.random());
-        deltaZ = factor * (-1.0 + 2.0 * Math.random());
+    let deltaX = factor * (-1.0 + 2.0 * Math.random());
+    let deltaZ = factor * (-1.0 + 2.0 * Math.random());
+    let y = this.ground.getHeightAtCoordinates(this.mesh.position.x + deltaX, this.mesh.position.z + deltaZ);
+
+    // in case it's going to be udnerwater, let's go in the opposite direction
+    if (y <= this.water.getPosition().y) {
+        deltaX = deltaX * -1.0;
+        deltaZ = deltaZ * -1.0;
         y = this.ground.getHeightAtCoordinates(this.mesh.position.x + deltaX, this.mesh.position.z + deltaZ);
-    } while (y <= this.water.getPosition().y);
+    }
 
     this.targetPosition = new BABYLON.Vector3(this.mesh.position.x + deltaX, y + this.radius, this.mesh.position.z + deltaZ);
 

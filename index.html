@@ -196,6 +196,7 @@
 
             z-index: 200000;
         }
+
         .loading-screen-right {
             position: relative;
             padding: 0;
@@ -239,7 +240,8 @@
 <script>
     // pre-load some images
     var pic = new Image();
-    pic.src="img/menu/assassin_1.png";
+    pic.src = "img/menu/assassin_1.png";
+
 
     var canvas = document.getElementById("renderCanvas");
 
@@ -387,7 +389,7 @@
                 projectileManager = new ProjectileManager(scene);
                 enemyManager = new EnemyManager(scene);
                 bushManager = new BushManager(scene);
-                treeManager = new TreeManager();
+                treeManager = new TreeManager(scene);
 
                 new GroundScanner(scene, ground, water, kelpManager, boulderManager, treeManager, bushManager, enemyManager);
             });
@@ -403,8 +405,6 @@
     }
     var engine;
     var scene;
-    var postProcess2;
-    var postProcess3;
 
     initFunction = function () {
         var asyncEngineCreation = function () {
@@ -420,82 +420,92 @@
         if (!engine) throw 'engine should not be null.';
         scene = createScene();
     };
-    initFunction();
+
+    setTimeout(function () {
+
+        initFunction();
 
 
-    window.addEventListener('keydown', function (event) {
-        window.console.log("Position: " + camera.position + ", ground height: " + ground.getHeightAtCoordinates(camera.position.x, camera.position.z));
-        if (event.keyCode == 32) {
-            keys.up = 1;
-        }
-    });
-    window.addEventListener('keyup', function (event) {
-        if (event.keyCode == 32) {
-            keys.up = 0;
+        window.addEventListener('keydown', function (event) {
+            window.console.log("Position: " + camera.position + ", ground height: " + ground.getHeightAtCoordinates(camera.position.x, camera.position.z));
+            if (event.keyCode == 32) {
+                keys.up = 1;
+            }
+        });
+        window.addEventListener('keyup', function (event) {
+            if (event.keyCode == 32) {
+                keys.up = 0;
 
-            // this is a hack for the camera not falling
-            camera._needMoveForGravity = true;
-        }
-    });
+                // this is a hack for the camera not falling
+                camera._needMoveForGravity = true;
+            }
+        });
 
 
-    sceneToRender = scene;
+        sceneToRender = scene;
 
-    let frameIndex = 0;
-    engine.runRenderLoop(function () {
+        let frameIndex = 0;
+        engine.runRenderLoop(function () {
 
-        let divFps = document.getElementById("fps");
+            let divFps = document.getElementById("fps");
 
-        if (sceneToRender && sceneToRender.activeCamera) {
-            divFps.innerHTML = engine.getFps().toFixed() + " fps";
-            sceneToRender.render();
+            if (sceneToRender && sceneToRender.activeCamera) {
+                divFps.innerHTML = engine.getFps().toFixed() + " fps";
+                sceneToRender.render();
 
-            frameIndex++;
+                frameIndex++;
 
-            let distanceFromWater = Math.abs(camera.position.y - water.getPosition().y);
+                let distanceFromWater = Math.abs(camera.position.y - water.getPosition().y);
 
-            if (water && player && (distanceFromWater < 50) && (frameIndex % 10 == 0)) {
-                if (water.isUnderwater(camera)) {
-                    if (!player.isUnderwater()) {
-                        fog.enableUnderwaterFog(scene);
-                        player.goUnderwater();
-                        new Sound(scene, "sounds/splash.wav", false);
-                        camera.applyGravity = false;
-                    }
-                } else {
-                    if (player.isUnderwater()) {
-                        fog.enableLandFog(scene);
-                        player.emergeFromUnderwater();
-                        camera.applyGravity = true;
+                if (water && player && (distanceFromWater < 50) && (frameIndex % 10 == 0)) {
+                    if (water.isUnderwater(camera)) {
+                        if (!player.isUnderwater()) {
+                            fog.enableUnderwaterFog(scene);
+                            player.goUnderwater();
+                            new Sound(scene, "sounds/splash.wav", false);
+                            camera.applyGravity = false;
+                        }
+                    } else {
+                        if (player.isUnderwater()) {
+                            fog.enableLandFog(scene);
+                            player.emergeFromUnderwater();
+                            camera.applyGravity = true;
+                        }
                     }
                 }
+
+                if (treeManager && frameIndex % 1000) {
+                    enemyManager.update(camera, ground, projectileManager, player, water);
+                    boulderManager.update(camera);
+                    bushManager.update(camera);
+                    treeManager.update(scene, camera);
+                    kelpManager.update(scene, camera, water);
+
+                    projectileManager.refreshProjectiles();
+
+                    updateCompass();
+                    updatePlayerPositionOnMap();
+                    updatePlayerBars();
+                }
+                if (projectileManager) {
+                    window.document.getElementById("loading-screen").style.display = "none";
+
+                    projectileManager.update();
+                }
+
+                if (enemyManager && projectileManager && camera) {
+                    enemyManager.checkIfHit(projectileManager, camera);
+                    player.checkIfHit(projectileManager);
+                }
             }
+        });
 
-            if (treeManager && frameIndex % 1000) {
-                enemyManager.update(camera, ground, projectileManager, player, water);
-                boulderManager.update(camera);
-                bushManager.update(camera);
-                treeManager.update(scene, camera);
-                kelpManager.update(camera, water);
+        // Resize
+        window.addEventListener("resize", function () {
+            engine.resize();
+        });
 
-                projectileManager.refreshProjectiles();
-
-                updateCompass();
-                updatePlayerPositionOnMap();
-                updatePlayerBars();
-            }
-            if (projectileManager) {
-                window.document.getElementById("loading-screen").style.display = "none";
-
-                projectileManager.update();
-            }
-
-            if (enemyManager && projectileManager && camera) {
-                enemyManager.checkIfHit(projectileManager, camera);
-                player.checkIfHit(projectileManager);
-            }
-        }
-    });
+    }, 1000);
 
     // distance between 2 points on a horizontal plane
     window.distance = function (vector1, vector2) {
@@ -505,11 +515,6 @@
     window.distance3d = function (vector1, vector2) {
         return Math.sqrt((vector1.x - vector2.x) * (vector1.x - vector2.x) + (vector1.z - vector2.z) * (vector1.z - vector2.z) + (vector1.y - vector2.y) * (vector1.y - vector2.y))
     }
-
-    // Resize
-    window.addEventListener("resize", function () {
-        engine.resize();
-    });
 
     var updateCompass = function () {
         if (camera) {

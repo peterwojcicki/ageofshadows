@@ -14,15 +14,16 @@ function BushManager(scene) {
     this.positions = [];
 
     this.bushes = [];
-    for (let i = 0; i < 50; i++) {
+    let bushCount = 50;
+    for (let i = 0; i < bushCount; i++) {
         this.bushes.push(new Bush(new BABYLON.Vector3(-100000, -10000, -100000), 0.1, this.furMaterial));
     }
 }
 
 BushManager.prototype.accept = function (scene, groundPosition, depth) {
-    if (depth < -10 && depth > -300) {
-        this.positions.push(groundPosition.add(new BABYLON.Vector3(0, 0, 0)));
-    }
+    //if (depth < -10 && depth > -300) {
+    //    this.positions.push(groundPosition.add(new BABYLON.Vector3(0, 0, 0)));
+    //}
 }
 
 BushManager.prototype.update = function (camera) {

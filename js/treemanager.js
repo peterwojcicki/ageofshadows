@@ -1,4 +1,4 @@
-function TreeManager() {
+function TreeManager(scene) {
     //trunk and branch material
     this.barkMaterial = new BABYLON.StandardMaterial("bark", scene);
     this.barkMaterial.emissiveTexture = new BABYLON.Texture("img/bark.jpg", scene);
@@ -25,7 +25,7 @@ function TreeManager() {
 
     this.positions = [];
     this.trees = [];
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 300; i++) {
         this.trees.push(new Tree(scene, new BABYLON.Vector3(0, -100, 0), this.barkMaterial));
     }
 }

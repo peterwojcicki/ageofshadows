@@ -1,6 +1,6 @@
 function GroundScanner(scene, ground, water, kelpManager, boulderManager, treeManager, bushManager, enemyManager) {
 
-    let stepBase = 30;
+    let stepBase = 20;
     let step = stepBase + 10 * Math.random();
 
     let xIteration = 0;
