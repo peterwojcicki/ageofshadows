@@ -85,4 +85,7 @@ Friend.prototype.follow = function (positionToFollow) {
         let slowDownFactor = 0.5;
         this.direction = this.direction.multiplyByFloats(slowDownFactor, slowDownFactor, slowDownFactor);
     }
+
+    // adjust the Y according to the actual step
+    this.direction.y = this.ground.getHeightAtCoordinates(this.mesh.position.x + this.direction.x, this.mesh.position.z + this.direction.z) + this.radius - this.mesh.position.y;
 }

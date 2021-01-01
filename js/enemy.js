@@ -100,4 +100,6 @@ Enemy.prototype.followPlayer = function (camera) {
 
     let speed = 0.6;
     this.direction = this.targetPosition.subtract(this.mesh.position).normalize().multiplyByFloats(speed, speed, speed);
+
+    this.direction.y = this.ground.getHeightAtCoordinates(this.mesh.position.x + this.direction.x, this.mesh.position.z + this.direction.z) + this.radius - this.mesh.position.y;
 }
