@@ -72,7 +72,7 @@ Enemy.prototype.resetDirection = function () {
 
     this.mesh.material = this.defaultMaterial;
 
-    let factor = 30.0;
+    let factor = 20.0;
 
     let deltaX = factor * (-1.0 + 2.0 * Math.random());
     let deltaZ = factor * (-1.0 + 2.0 * Math.random());
@@ -98,7 +98,7 @@ Enemy.prototype.followPlayer = function (camera) {
     let enemyY = this.ground.getHeightAtCoordinates(camera.position.x, camera.position.z);
     this.targetPosition = new BABYLON.Vector3(camera.position.x, enemyY + this.radius, camera.position.z);
 
-    let speed = 0.6;
+    let speed = 0.3;
     this.direction = this.targetPosition.subtract(this.mesh.position).normalize().multiplyByFloats(speed, speed, speed);
 
     this.direction.y = this.ground.getHeightAtCoordinates(this.mesh.position.x + this.direction.x, this.mesh.position.z + this.direction.z) + this.radius - this.mesh.position.y;

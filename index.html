@@ -349,8 +349,8 @@
 
         camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 200, 50), scene);
         camera.attachControl(canvas, true);
-        camera.angularsensibility *= -0.3;
-        camera.speed = 10;
+        camera.angularsensibility *= -0.2;
+        camera.speed = 2;
 //        camera.ellipsoid = new BABYLON.Vector3(1, 1, 1);
         // TODO this is a hack - making the camera's elipsoid very thin prevents sliding down slopes
         camera.ellipsoid = new BABYLON.Vector3(0.01, 1, 0.01);
