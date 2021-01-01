@@ -16,7 +16,7 @@ function EnemyManager(scene) {
 
 EnemyManager.prototype.accept = function (scene, groundPosition, depth) {
     if (depth < -10 && depth > -200) {
-        this.positions.push(groundPosition.add(new BABYLON.Vector3(0, 2.0, 0)));
+        this.positions.push(groundPosition.add(new BABYLON.Vector3(0, 1.0, 0)));
     }
 }
 
@@ -30,7 +30,7 @@ EnemyManager.prototype.update = function (camera, ground, projectileManager, pla
 
             if (!this.enemyExistsAtPosition(enemyPosition)) {
                 window.console.log("EnemyManager.update - show enemy at position " + enemyPosition);
-                this.enemys.push(new Enemy(enemyPosition, 2.0, this.defaultMaterial, this.alertedMaterial, ground, projectileManager, player, water));
+                this.enemys.push(new Enemy(enemyPosition, 1.0, this.defaultMaterial, this.alertedMaterial, ground, projectileManager, player, water));
                 this.positionsWithEnemy.push(enemyPosition);
             }
         }
@@ -50,6 +50,7 @@ EnemyManager.prototype.enemyExistsAtPosition = function (position) {
 EnemyManager.prototype.checkIfHit = function (projectileManager, camera) {
 
     let projectiles = projectileManager.getProjectiles();
+    let atLeastOneEnemyHasBeenKilled = false;
 
     for (let i = 0; i < this.enemys.length; i++) {
         let enemy = this.enemys[i];
@@ -58,6 +59,25 @@ EnemyManager.prototype.checkIfHit = function (projectileManager, camera) {
 
         for (let j = 0; j < projectiles.length; j++) {
             enemy.hit(projectiles[j]);
+
+            if (!atLeastOneEnemyHasBeenKilled && !enemy.isActive()) {
+                atLeastOneEnemyHasBeenKilled = true;
+            }
         }
     }
+
+    if (atLeastOneEnemyHasBeenKilled) {
+        let activeEnemies = [];
+        for (let i = 0; i < this.enemys.length; i++) {
+            let enemy = this.enemys[i];
+            if (enemy.isActive()) {
+                activeEnemies.push(enemy);
+            }
+        }
+        this.enemys = activeEnemies;
+    }
+}
+
+EnemyManager.prototype.getEnemies = function () {
+    return this.enemys;
 }

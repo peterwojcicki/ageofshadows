@@ -9,7 +9,7 @@ function Enemy(position, radius, defaultMaterial, alertedMaterial, ground, proje
     this.radius = radius;
     this.ground = ground;
     this.projectileManager = projectileManager;
-    this.isActive = true;
+    this.active = true;
 
     this.lastAttactAt = 0;
     this.player = player;
@@ -18,15 +18,23 @@ function Enemy(position, radius, defaultMaterial, alertedMaterial, ground, proje
     this.resetDirection();
 }
 
+Enemy.prototype.isActive = function () {
+    return this.active;
+}
+
+Enemy.prototype.getPosition = function () {
+    return this.mesh.position;
+}
+
 Enemy.prototype.die = function () {
-    this.isActive = false;
+    this.active = false;
     this.mesh.setEnabled(false);
 
     new Sound(scene, "sounds/creatures/man_die_2.wav", false);
 }
 
 Enemy.prototype.hit = function (projectile) {
-    if (this.isActive && this != projectile.getShooter()) {
+    if (this.active && this != projectile.getShooter()) {
         if (distance3d(projectile.getPosition(), this.mesh.position) <= this.radius) {
             this.die();
             projectile.deactivate();
@@ -38,7 +46,7 @@ Enemy.prototype.hit = function (projectile) {
 }
 
 Enemy.prototype.move = function (camera) {
-    if (this.isActive) {
+    if (this.active) {
         if (distance3d(this.mesh.position, camera.position) < 100) {
 
             // chase player
@@ -70,7 +78,7 @@ Enemy.prototype.resetDirection = function () {
     let deltaZ = factor * (-1.0 + 2.0 * Math.random());
     let y = this.ground.getHeightAtCoordinates(this.mesh.position.x + deltaX, this.mesh.position.z + deltaZ);
 
-    // in case it's going to be udnerwater, let's go in the opposite direction
+    // in case it's going to be underwater, let's go in the opposite direction
     if (y <= this.water.getPosition().y) {
         deltaX = deltaX * -1.0;
         deltaZ = deltaZ * -1.0;

@@ -1,4 +1,4 @@
-function GroundScanner(scene, ground, water, kelpManager, boulderManager, treeManager, bushManager, enemyManager) {
+function GroundScanner(scene, ground, water, kelpManager, boulderManager, treeManager, bushManager, enemyManager, friendManager) {
 
     let stepBase = 20;
     let step = stepBase + 10 * Math.random();
@@ -34,6 +34,7 @@ function GroundScanner(scene, ground, water, kelpManager, boulderManager, treeMa
 
             if ((xIteration % 9 == 0) && (zIteration % 9 == 0)) {
                 enemyManager.accept(scene, currentGroundPosition, depth);
+                friendManager.accept(scene, currentGroundPosition, depth);
             }
         }
     }
