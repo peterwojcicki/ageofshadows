@@ -166,6 +166,17 @@
             border-radius: 4px;
         }
 
+        .rescuable-friend-dot {
+            position: relative;
+            top: 80px;
+            left: 80px;
+
+            width: 8px;
+            height: 8px;
+            background: #00ffff;
+            border-radius: 4px;
+        }
+
         .loading-screen {
             display: flex;
 
@@ -234,7 +245,10 @@
 <div id="life" class="life"></div>
 <div id="kills" class="kills"></div>
 <div id="map" class="map">
-    <div id="player-dot" class="player-dot"/>
+    <div id="player-dot" class="player-dot">
+    </div>
+    <div id="rescuable-friend-dot" class="rescuable-friend-dot">
+    </div>
 </div>
 
 <div id="crosshair" class="crosshair"></div>
@@ -525,24 +539,31 @@
 
     var updateCompass = function () {
         if (camera) {
-            window.document.getElementById("compass").style.transform = "rotate(" + camera.rotation.y + "rad)";
+            window.document.getElementById("compass").style.transform = "rotate(" + (-camera.rotation.y) + "rad)";
         }
     }
 
     var updatePlayerPositionOnMap = function () {
         if (camera) {
-            let mapWidth = window.document.getElementById("map").clientHeight;
-            let terrainWidth = 10000;
+            updateElementPositionOnMap("player-dot", camera.position);
 
-            let newX = camera.position.x + (terrainWidth / 2.0);
-            let newY = terrainWidth - (camera.position.z + (terrainWidth / 2.0));
-
-            newX = mapWidth * (newX / terrainWidth);
-            newY = mapWidth * (newY / terrainWidth);
-
-            window.document.getElementById("player-dot").style.left = newX + "px";
-            window.document.getElementById("player-dot").style.top = newY + "px";
+            // TODO we assume there's just 1 rescuable friend
+            updateElementPositionOnMap("rescuable-friend-dot", friendManager.getRescuableFriends()[0].getPosition());
         }
+    }
+
+    var updateElementPositionOnMap = function (elementId, positionInGame) {
+        let mapWidth = window.document.getElementById("map").clientHeight;
+        let terrainWidth = 10000;
+
+        let newX = positionInGame.x + (terrainWidth / 2.0);
+        let newY = terrainWidth - (positionInGame.z + (terrainWidth / 2.0));
+
+        newX = mapWidth * (newX / terrainWidth);
+        newY = mapWidth * (newY / terrainWidth);
+
+        window.document.getElementById(elementId).style.left = newX + "px";
+        window.document.getElementById(elementId).style.top = newY + "px";
     }
 
     var updatePlayerBars = function () {

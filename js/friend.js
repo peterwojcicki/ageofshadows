@@ -1,13 +1,12 @@
-function Friend(position, radius, defaultMaterial, ground, water) {
+function Friend(position, radius, material, ground, water, rescuable) {
     this.mesh = BABYLON.MeshBuilder.CreateSphere("sphere", {segments: 10, diameter: radius * 2.0});
     this.mesh.position = position;
-    this.mesh.material = defaultMaterial;
-
-    this.defaultMaterial = defaultMaterial;
+    this.mesh.material = material;
 
     this.radius = radius;
     this.ground = ground;
     this.isActive = true;
+    this.rescuable = rescuable;
 
     this.water = water;
 
@@ -30,7 +29,7 @@ Friend.prototype.move = function (camera, enemyManager) {
         }
 
         if (!isFollowingEnemy) {
-            if (distance3d(this.mesh.position, camera.position) < 150) {
+            if (this.rescuable && distance3d(this.mesh.position, camera.position) < 300) {
                 // chase player
                 this.followPlayer(camera);
 
@@ -88,4 +87,12 @@ Friend.prototype.follow = function (positionToFollow) {
 
     // adjust the Y according to the actual step
     this.direction.y = this.ground.getHeightAtCoordinates(this.mesh.position.x + this.direction.x, this.mesh.position.z + this.direction.z) + this.radius - this.mesh.position.y;
+}
+
+Friend.prototype.isRescuable = function() {
+    return this.rescuable;
+}
+
+Friend.prototype.getPosition = function() {
+    return this.mesh.position;
 }
